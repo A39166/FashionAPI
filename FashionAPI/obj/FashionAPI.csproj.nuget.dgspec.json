@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Project\\ECM_WEB_BE\\FashionAPI\\FashionAPI.csproj": {}
+    "D:\\Project\\FashionAPI\\FashionAPI\\FashionAPI.csproj": {}
   },
   "projects": {
-    "D:\\Project\\ECM_WEB_BE\\FashionAPI\\FashionAPI.csproj": {
+    "D:\\Project\\FashionAPI\\FashionAPI\\FashionAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Project\\ECM_WEB_BE\\FashionAPI\\FashionAPI.csproj",
+        "projectUniqueName": "D:\\Project\\FashionAPI\\FashionAPI\\FashionAPI.csproj",
         "projectName": "FashionAPI",
-        "projectPath": "D:\\Project\\ECM_WEB_BE\\FashionAPI\\FashionAPI.csproj",
+        "projectPath": "D:\\Project\\FashionAPI\\FashionAPI\\FashionAPI.csproj",
         "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
-        "outputPath": "D:\\Project\\ECM_WEB_BE\\FashionAPI\\obj\\",
+        "outputPath": "D:\\Project\\FashionAPI\\FashionAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",

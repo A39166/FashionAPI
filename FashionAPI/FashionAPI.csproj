@@ -51,7 +51,7 @@
 
   <ItemGroup>
     <Folder Include="Databases\" />
-    <Folder Include="resources\" />
+    <Folder Include="resources\empty\" />
   </ItemGroup>
 
 </Project>
