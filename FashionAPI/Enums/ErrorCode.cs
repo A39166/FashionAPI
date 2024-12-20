@@ -55,5 +55,14 @@ namespace FashionAPI.Enums
         [Description("Tài khoản này không có quyền đăng nhập Admin!")]
         NO_PERMISSION = 28,
 
+        [Description("Tài khoản đã có")]
+        DUPLICATE_EMAIL = 29,
+
+        [Description("Không tìm thấy người dùng!")]
+        USER_NOTFOUND = 30,
+
+        [Description("Sai mật khẩu cũ!")]
+        WRONG_OLD_PASS = 31,
+
     }
 }
