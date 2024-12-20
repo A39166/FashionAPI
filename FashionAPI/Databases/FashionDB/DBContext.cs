@@ -15,11 +15,15 @@ public partial class DBContext : DbContext
 
     public virtual DbSet<Color> Color { get; set; }
 
+    public virtual DbSet<District> District { get; set; }
+
     public virtual DbSet<Product> Product { get; set; }
 
     public virtual DbSet<ProductImage> ProductImage { get; set; }
 
     public virtual DbSet<ProductVariant> ProductVariant { get; set; }
+
+    public virtual DbSet<Province> Province { get; set; }
 
     public virtual DbSet<Sessions> Sessions { get; set; }
 
@@ -28,6 +32,8 @@ public partial class DBContext : DbContext
     public virtual DbSet<User> User { get; set; }
 
     public virtual DbSet<UserAddress> UserAddress { get; set; }
+
+    public virtual DbSet<Ward> Ward { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -101,6 +107,37 @@ public partial class DBContext : DbContext
                 .HasDefaultValueSql("uuid()")
                 .IsFixedLength()
                 .HasColumnName("uuid");
+        });
+
+        modelBuilder.Entity<District>(entity =>
+        {
+            entity.HasKey(e => e.Maqh).HasName("PRIMARY");
+
+            entity
+                .ToTable("district")
+                .HasCharSet("latin1")
+                .UseCollation("latin1_swedish_ci");
+
+            entity.Property(e => e.Maqh)
+                .HasMaxLength(20)
+                .HasColumnName("maqh")
+                .UseCollation("utf8mb4_unicode_520_ci")
+                .HasCharSet("utf8mb4");
+            entity.Property(e => e.Matp)
+                .HasMaxLength(5)
+                .HasColumnName("matp")
+                .UseCollation("utf8mb4_unicode_520_ci")
+                .HasCharSet("utf8mb4");
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .HasColumnName("name")
+                .UseCollation("utf8_general_ci")
+                .HasCharSet("utf8");
+            entity.Property(e => e.Type)
+                .HasMaxLength(100)
+                .HasColumnName("type")
+                .UseCollation("utf8_general_ci")
+                .HasCharSet("utf8");
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -243,6 +280,35 @@ public partial class DBContext : DbContext
                 .HasConstraintName("fk_size_uuid_pv");
         });
 
+        modelBuilder.Entity<Province>(entity =>
+        {
+            entity.HasKey(e => e.Matp).HasName("PRIMARY");
+
+            entity
+                .ToTable("province")
+                .HasCharSet("latin1")
+                .UseCollation("latin1_swedish_ci");
+
+            entity.Property(e => e.Matp)
+                .HasMaxLength(5)
+                .HasColumnName("matp")
+                .UseCollation("utf8mb4_unicode_520_ci")
+                .HasCharSet("utf8mb4");
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .HasColumnName("name")
+                .UseCollation("utf8_general_ci")
+                .HasCharSet("utf8");
+            entity.Property(e => e.Slug)
+                .HasMaxLength(70)
+                .HasColumnName("slug");
+            entity.Property(e => e.Type)
+                .HasMaxLength(100)
+                .HasColumnName("type")
+                .UseCollation("utf8_general_ci")
+                .HasCharSet("utf8");
+        });
+
         modelBuilder.Entity<Sessions>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -368,7 +434,13 @@ public partial class DBContext : DbContext
 
             entity.ToTable("user_address");
 
+            entity.HasIndex(e => e.Maqh, "fk_maqh_address");
+
+            entity.HasIndex(e => e.Matp, "fk_matp_address");
+
             entity.HasIndex(e => e.UserUuid, "fk_user_uuid_ua");
+
+            entity.HasIndex(e => e.Xaid, "fk_xaid_address");
 
             entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
 
@@ -382,10 +454,10 @@ public partial class DBContext : DbContext
                 .HasMaxLength(50)
                 .HasColumnName("fullname");
             entity.Property(e => e.Maqh)
-                .HasColumnType("int(11)")
+                .HasMaxLength(5)
                 .HasColumnName("maqh");
             entity.Property(e => e.Matp)
-                .HasColumnType("int(11)")
+                .HasMaxLength(5)
                 .HasColumnName("matp");
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
@@ -408,13 +480,59 @@ public partial class DBContext : DbContext
                 .IsFixedLength()
                 .HasColumnName("uuid");
             entity.Property(e => e.Xaid)
-                .HasColumnType("int(11)")
+                .HasMaxLength(5)
                 .HasColumnName("xaid");
+
+            entity.HasOne(d => d.MaqhNavigation).WithMany(p => p.UserAddress)
+                .HasForeignKey(d => d.Maqh)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_maqh_address");
+
+            entity.HasOne(d => d.MatpNavigation).WithMany(p => p.UserAddress)
+                .HasForeignKey(d => d.Matp)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_matp_address");
 
             entity.HasOne(d => d.UserUu).WithMany(p => p.UserAddress)
                 .HasPrincipalKey(p => p.Uuid)
                 .HasForeignKey(d => d.UserUuid)
                 .HasConstraintName("fk_user_uuid_ua");
+
+            entity.HasOne(d => d.Xa).WithMany(p => p.UserAddress)
+                .HasForeignKey(d => d.Xaid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_xaid_address");
+        });
+
+        modelBuilder.Entity<Ward>(entity =>
+        {
+            entity.HasKey(e => e.Xaid).HasName("PRIMARY");
+
+            entity
+                .ToTable("ward")
+                .HasCharSet("latin1")
+                .UseCollation("latin1_swedish_ci");
+
+            entity.Property(e => e.Xaid)
+                .HasMaxLength(20)
+                .HasColumnName("xaid")
+                .UseCollation("utf8mb4_unicode_520_ci")
+                .HasCharSet("utf8mb4");
+            entity.Property(e => e.Maqh)
+                .HasMaxLength(5)
+                .HasColumnName("maqh")
+                .UseCollation("utf8mb4_unicode_520_ci")
+                .HasCharSet("utf8mb4");
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .HasColumnName("name")
+                .UseCollation("utf8_general_ci")
+                .HasCharSet("utf8");
+            entity.Property(e => e.Type)
+                .HasMaxLength(70)
+                .HasColumnName("type")
+                .UseCollation("utf8_general_ci")
+                .HasCharSet("utf8");
         });
 
         OnModelCreatingPartial(modelBuilder);

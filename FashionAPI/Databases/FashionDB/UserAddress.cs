@@ -17,11 +17,11 @@ public partial class UserAddress
 
     public string Address { get; set; } = null!;
 
-    public int Matp { get; set; }
+    public string Matp { get; set; } = null!;
 
-    public int Maqh { get; set; }
+    public string Maqh { get; set; } = null!;
 
-    public int Xaid { get; set; }
+    public string Xaid { get; set; } = null!;
 
     public DateTime TimeCreated { get; set; }
 
@@ -30,5 +30,11 @@ public partial class UserAddress
     /// </summary>
     public sbyte Status { get; set; }
 
+    public virtual District MaqhNavigation { get; set; } = null!;
+
+    public virtual Province MatpNavigation { get; set; } = null!;
+
     public virtual User UserUu { get; set; } = null!;
+
+    public virtual Ward Xa { get; set; } = null!;
 }
