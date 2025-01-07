@@ -304,7 +304,7 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        [HttpPost("detail_user_client")]
+        [HttpPost("detail-user-client")]
         [SwaggerResponse(statusCode: 200, type: typeof(UserClientDTO), description: "DetailUserClient Response")]
         public async Task<IActionResult> DetailUserClient()
         {
@@ -351,7 +351,7 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        [HttpPost("change_password")]
+        [HttpPost("change-password")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "ChangePassword Response")]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequest request)
         {
@@ -398,7 +398,7 @@ namespace FashionAPI.Controllers
             }
         }
 
-        [HttpPost("send_otp")]
+        [HttpPost("send-otp")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "SendOtpEmail Response")]
         public async Task<IActionResult> SendOtpEmail(SendOtpRequest request)
         {
