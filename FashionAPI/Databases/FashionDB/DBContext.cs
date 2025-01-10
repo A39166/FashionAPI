@@ -11,6 +11,10 @@ public partial class DBContext : DbContext
     {
     }
 
+    public virtual DbSet<Cart> Cart { get; set; }
+
+    public virtual DbSet<CartItem> CartItem { get; set; }
+
     public virtual DbSet<Category> Category { get; set; }
 
     public virtual DbSet<Color> Color { get; set; }
@@ -40,6 +44,88 @@ public partial class DBContext : DbContext
         modelBuilder
             .UseCollation("utf8mb4_unicode_520_ci")
             .HasCharSet("utf8mb4");
+
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("cart");
+
+            entity.HasIndex(e => e.UserUuid, "fk_user_uuid_cart");
+
+            entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.Status)
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("status");
+            entity.Property(e => e.TimeCreated)
+                .HasDefaultValueSql("current_timestamp()")
+                .HasColumnType("timestamp")
+                .HasColumnName("time_created");
+            entity.Property(e => e.UserUuid)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("user_uuid");
+            entity.Property(e => e.Uuid)
+                .HasMaxLength(36)
+                .HasDefaultValueSql("uuid()")
+                .IsFixedLength()
+                .HasColumnName("uuid");
+
+            entity.HasOne(d => d.UserUu).WithMany(p => p.Cart)
+                .HasPrincipalKey(p => p.Uuid)
+                .HasForeignKey(d => d.UserUuid)
+                .HasConstraintName("fk_user_uuid_cart");
+        });
+
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("cart_item");
+
+            entity.HasIndex(e => e.CartUuid, "kf_cart_uuid_pc");
+
+            entity.HasIndex(e => e.ProductVariantUuid, "kf_product_variant_uuid_pc");
+
+            entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.CartUuid)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("cart_uuid");
+            entity.Property(e => e.ProductVariantUuid)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("product_variant_uuid");
+            entity.Property(e => e.Quantity)
+                .HasColumnType("int(11)")
+                .HasColumnName("quantity");
+            entity.Property(e => e.Status)
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("status");
+            entity.Property(e => e.Uuid)
+                .HasMaxLength(36)
+                .HasDefaultValueSql("uuid()")
+                .IsFixedLength()
+                .HasColumnName("uuid");
+
+            entity.HasOne(d => d.CartUu).WithMany(p => p.CartItem)
+                .HasPrincipalKey(p => p.Uuid)
+                .HasForeignKey(d => d.CartUuid)
+                .HasConstraintName("kf_cart_uuid_pc");
+
+            entity.HasOne(d => d.ProductVariantUu).WithMany(p => p.CartItem)
+                .HasPrincipalKey(p => p.Uuid)
+                .HasForeignKey(d => d.ProductVariantUuid)
+                .HasConstraintName("kf_product_variant_uuid_pc");
+        });
 
         modelBuilder.Entity<Category>(entity =>
         {

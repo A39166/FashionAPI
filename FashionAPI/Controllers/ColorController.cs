@@ -228,5 +228,48 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+
+        [HttpPost("get-color-category")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetColorCategory Response")]
+        public async Task<IActionResult> GetColorCategory(BaseKeywordRequest request)
+        {
+            var response = new BaseResponseMessageItem<ShortCategoryDTO>();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var color = _context.Color.Where(x => string.IsNullOrEmpty(request.Keyword)
+                                                        || EF.Functions.Like(x.ColorName + " ", $"%{request.Keyword}%"))
+                                                 .Where(x => x.Status == 1)
+                                                 .ToList();
+                if (color != null)
+                {
+                    response.Data = color.Select(p => new ShortCategoryDTO
+                    {
+                        Uuid = p.Uuid,
+                        Name = p.ColorName,
+                        Status = p.Status
+                    }).ToList();
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
     }
+    
 }

@@ -19,6 +19,8 @@ public partial class ProductVariant
 
     public sbyte Status { get; set; }
 
+    public virtual ICollection<CartItem> CartItem { get; set; } = new List<CartItem>();
+
     public virtual Color ColorUu { get; set; } = null!;
 
     public virtual Product ProductUu { get; set; } = null!;

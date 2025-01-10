@@ -38,6 +38,8 @@ public partial class User
 
     public string? Path { get; set; }
 
+    public virtual ICollection<Cart> Cart { get; set; } = new List<Cart>();
+
     public virtual ICollection<Sessions> Sessions { get; set; } = new List<Sessions>();
 
     public virtual ICollection<UserAddress> UserAddress { get; set; } = new List<UserAddress>();
