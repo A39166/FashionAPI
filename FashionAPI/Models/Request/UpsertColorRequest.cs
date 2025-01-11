@@ -7,5 +7,6 @@ namespace FashionAPI.Models.Request
     public class UpsertColorRequest: UuidRequest
     {
         public string ColorName { get; set; }
+        public string Code { get; set; }
     }
 }

@@ -48,10 +48,15 @@ namespace FashionAPI.Controllers
             {
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
-                    
+                    var check = _context.Color.Where(x => x.ColorName.ToLower() == request.ColorName.ToLower()).FirstOrDefault();
+                    if (check != null)
+                    {
+                        throw new ErrorException(ErrorCode.DUPLICATE_SIZE);
+                    }
                     var color = new Color()
                     {
                         Uuid = Guid.NewGuid().ToString(),
+                        Code = request.Code,
                         ColorName = request.ColorName,
                         TimeCreated = DateTime.Now,
                         Status = 1,
@@ -66,6 +71,7 @@ namespace FashionAPI.Controllers
                     if (color != null)
                     {
                         color.ColorName = request.ColorName;
+                        color.Code = request.Code;
                         color.Status = 1;
                         _context.SaveChanges();
                     }
@@ -160,7 +166,6 @@ namespace FashionAPI.Controllers
 
             try
             {
-                //TODO: Write code late
 
                 var colordetail = _context.Color.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
                 if (colordetail != null)
@@ -229,47 +234,7 @@ namespace FashionAPI.Controllers
             }
         }
 
-        [HttpPost("get-color-category")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetColorCategory Response")]
-        public async Task<IActionResult> GetColorCategory(BaseKeywordRequest request)
-        {
-            var response = new BaseResponseMessageItem<ShortCategoryDTO>();
-
-            var validToken = validateToken(_context);
-            if (validToken is null)
-            {
-                return Unauthorized();
-            }
-            try
-            {
-                var color = _context.Color.Where(x => string.IsNullOrEmpty(request.Keyword)
-                                                        || EF.Functions.Like(x.ColorName + " ", $"%{request.Keyword}%"))
-                                                 .Where(x => x.Status == 1)
-                                                 .ToList();
-                if (color != null)
-                {
-                    response.Data = color.Select(p => new ShortCategoryDTO
-                    {
-                        Uuid = p.Uuid,
-                        Name = p.ColorName,
-                        Status = p.Status
-                    }).ToList();
-                }
-                return Ok(response);
-            }
-            catch (ErrorException ex)
-            {
-                response.error.SetErrorCode(ex.Code);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
-                _logger.LogError(ex.Message);
-
-                return BadRequest(response);
-            }
-        }
+        
     }
     
 }

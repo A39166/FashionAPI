@@ -64,5 +64,10 @@ namespace FashionAPI.Enums
         [Description("Sai mật khẩu cũ!")]
         WRONG_OLD_PASS = 31,
 
+        [Description("Size đã có!")]
+        DUPLICATE_SIZE = 32,
+
+        [Description("Màu đã có!")]
+        DUPLICATE_COLOR = 33,
     }
 }

@@ -55,10 +55,6 @@ namespace CinemaAPI.Controllers
                 {
                     throw new ErrorException(ErrorCode.WRONG_LOGIN);
                 }
-                /*if(user.Status == 2)
-                {
-                    throw new ErrorException(ErrorCode.LOCKED_ACCOUNT);
-                }*/
                 if (user != null)
                 {
                     _token = new TokenInfo()

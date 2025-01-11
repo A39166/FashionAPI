@@ -48,7 +48,11 @@ namespace FashionAPI.Controllers
             {
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
-                    
+                    var check = _context.Size.Where(x => x.SizeName.ToLower() == request.SizeName.ToLower()).FirstOrDefault();
+                    if(check != null)
+                    {
+                        throw new ErrorException(ErrorCode.DUPLICATE_SIZE);
+                    }
                     var size = new Size()
                     {
                         Uuid = Guid.NewGuid().ToString(),
@@ -62,11 +66,12 @@ namespace FashionAPI.Controllers
                 else
                 //cập nhập dữ liệu
                 {
-                    var color = _context.Size.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
-                    if (color != null)
+                    var size = _context.Size.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
+                    if (size != null)
                     {
-                        color.SizeName = request.SizeName;
-                        color.Status = 1;
+                        size.SizeName = request.SizeName;
+                        size.Status = 1;
+                        _context.Size.Update(size);
                         _context.SaveChanges();
                     }
                     else

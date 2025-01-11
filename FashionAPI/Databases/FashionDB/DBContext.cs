@@ -178,6 +178,9 @@ public partial class DBContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
+            entity.Property(e => e.Code)
+                .HasMaxLength(5)
+                .HasColumnName("code");
             entity.Property(e => e.ColorName)
                 .HasMaxLength(10)
                 .HasColumnName("color_name");

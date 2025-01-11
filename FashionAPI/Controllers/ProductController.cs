@@ -52,20 +52,78 @@ namespace FashionAPI.Controllers
                         Price = request.Price,
                         TimeCreated = DateTime.Now,
                         Status = 1,
+
                     };
                     _context.Product.Add(product);
-                    _context.SaveChanges();
+                    
 
+                    if (request.Variants != null && request.Variants.Count > 0)
+                    {
+                        foreach (var variant in request.Variants)
+                        {
+                            var productVariant = new Databases.FashionDB.ProductVariant()
+                            {
+                                Uuid = Guid.NewGuid().ToString(),
+                                ProductUuid = product.Uuid,
+                                SizeUuid = variant.SizeUuid,
+                                ColorUuid = variant.ColorUuid,
+                                Stock = variant.Stock,
+                            };
+                            _context.ProductVariant.Add(productVariant);
+                        }
+                        _context.SaveChanges();
+                    }
+                    if(request.ImagesPath != null)
+                    {
+                        foreach (var image in request.ImagesPath)
+                        {
+                            var imagepath = new ProductImage()
+                            {
+                                Uuid = Guid.NewGuid().ToString(),
+                                ProductUuid = product.Uuid,
+                                Path = image,
+                            };
+                            _context.ProductImage.Add(imagepath);
+                        }
+                    }
+                    _context.SaveChanges();
                 }
                 else
                 //cập nhập dữ liệu
                 {
-                    var color = _context.Color.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
-                    if (color != null)
+                    var product = _context.Product.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
+                    if (product != null)
                     {
-                        color.ColorName = request.ColorName;
-                        color.Status = 1;
+                        product.CatUuid = request.CatUuid;
+                        product.Code = request.Code;
+                        product.ProductName = request.ProductName;
+                        product.Description = request.Description;
+                        product.Price = request.Price;
                         _context.SaveChanges();
+                        if(request.Variants != null)
+                        {
+                            foreach(var variant in request.Variants)
+                            {
+                                var existVariant = _context.ProductVariant.Where(e => e.ProductUuid == product.Uuid && e.SizeUuid == variant.SizeUuid
+                                                                                && e.ColorUuid == variant.ColorUuid).FirstOrDefault();
+                                if(existVariant != null)
+                                {
+                                    variant.Stock = existVariant.Stock;
+                                }
+                                else
+                                {
+                                    var productVariant = new Databases.FashionDB.ProductVariant()
+                                    {
+                                        ProductUuid = product.Uuid,
+                                        SizeUuid = variant.SizeUuid,
+                                        ColorUuid = variant.ColorUuid,
+                                        Stock = variant.Stock,
+                                    };
+                                    _context.ProductVariant.Add(productVariant);
+                                }
+                            }
+                            _context.SaveChanges();
+                        }
                     }
                     else
                     {

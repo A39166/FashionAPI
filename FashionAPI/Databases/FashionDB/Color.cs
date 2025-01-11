@@ -9,6 +9,8 @@ public partial class Color
 
     public string Uuid { get; set; } = null!;
 
+    public string Code { get; set; } = null!;
+
     public string ColorName { get; set; } = null!;
 
     public DateTime TimeCreated { get; set; }
