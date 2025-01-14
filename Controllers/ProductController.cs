@@ -41,7 +41,6 @@ namespace FashionAPI.Controllers
             {
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
-                    
                     var product = new Product()
                     {
                         Uuid = Guid.NewGuid().ToString(),
@@ -99,6 +98,7 @@ namespace FashionAPI.Controllers
                         product.ProductName = request.ProductName;
                         product.Description = request.Description;
                         product.Price = request.Price;
+                        _context.Update(product);
                         _context.SaveChanges();
                         if(request.Variants != null)
                         {
@@ -146,10 +146,10 @@ namespace FashionAPI.Controllers
             }
         }
         [HttpPost("page-list-product")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessagePage<ColorDTO>), description: "GetPageListProduct Response")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessagePage<PageListProductDTO>), description: "GetPageListProduct Response")]
         public async Task<IActionResult> GetPageListProduct(DpsPagingParamBase request)
         {
-            var response = new BaseResponseMessagePage<ColorDTO>();
+            var response = new BaseResponseMessagePage<PageListProductDTO>();
 
             var validToken = validateToken(_context);
             if (validToken is null)
@@ -166,11 +166,11 @@ namespace FashionAPI.Controllers
                     var result = lstColor.OrderByDescending(x => x.Id).TakePage(request.Page, request.PageSize);
                     if (result != null && result.Count > 0)
                     {
-                        response.Data.Items = new List<ColorDTO>();
+                        response.Data.Items = new List<PageListProductDTO>();
                     }
                     foreach (var color in result)
                     {
-                        var convertItemDTO = new ColorDTO()
+                        var convertItemDTO = new PageListProductDTO()
                         {
                             Uuid = color.Uuid,
                             ColorName = color.ColorName,
@@ -202,9 +202,9 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        [HttpPost("color-detail")]
-        [SwaggerResponse(statusCode: 200, type: typeof(ColorDTO), description: "GetColorDetail Response")]
-        public async Task<IActionResult> GetColorDetail(UuidRequest request)
+        [HttpPost("product-detail")]
+        [SwaggerResponse(statusCode: 200, type: typeof(ColorDTO), description: "GetProductDetail Response")]
+        public async Task<IActionResult> GetProductDetail(UuidRequest request)
         {
             var response = new BaseResponseMessage<ColorDTO>();
 
@@ -244,9 +244,9 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        [HttpPost("update-color-status")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateColorStatus Response")]
-        public async Task<IActionResult> UpdateColorStatus(UpdateStatusRequest request)
+        [HttpPost("update-product-status")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateProductStatus Response")]
+        public async Task<IActionResult> UpdateProductStatus(UpdateStatusRequest request)
         {
             var response = new BaseResponse();
 
