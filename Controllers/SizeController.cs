@@ -57,6 +57,7 @@ namespace FashionAPI.Controllers
                     {
                         Uuid = Guid.NewGuid().ToString(),
                         SizeName = request.SizeName,
+                        Description = request.Description,
                         TimeCreated = DateTime.Now,
                         Status = 1,
                     };
@@ -70,6 +71,7 @@ namespace FashionAPI.Controllers
                     if (size != null)
                     {
                         size.SizeName = request.SizeName;
+                        size.Description = request.Description;
                         size.Status = 1;
                         _context.Size.Update(size);
                         _context.SaveChanges();
@@ -123,6 +125,7 @@ namespace FashionAPI.Controllers
                         {
                             Uuid = color.Uuid,
                             SizeName = color.SizeName,
+                            Description = color.Description,
                             TimeCreated = color.TimeCreated,
                             Status = color.Status,
                         };
@@ -174,6 +177,7 @@ namespace FashionAPI.Controllers
                     {
                         Uuid = sizedetail.Uuid,
                         SizeName = sizedetail.SizeName,
+                        Description = sizedetail.Description,
                         TimeCreated = sizedetail.TimeCreated,
                         Status = sizedetail.Status,
                     };

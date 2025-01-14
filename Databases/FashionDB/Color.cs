@@ -13,6 +13,8 @@ public partial class Color
 
     public string ColorName { get; set; } = null!;
 
+    public string Description { get; set; } = null!;
+
     public DateTime TimeCreated { get; set; }
 
     public sbyte Status { get; set; }

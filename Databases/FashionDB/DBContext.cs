@@ -21,6 +21,10 @@ public partial class DBContext : DbContext
 
     public virtual DbSet<District> District { get; set; }
 
+    public virtual DbSet<Order> Order { get; set; }
+
+    public virtual DbSet<OrderItem> OrderItem { get; set; }
+
     public virtual DbSet<Product> Product { get; set; }
 
     public virtual DbSet<ProductImage> ProductImage { get; set; }
@@ -184,6 +188,9 @@ public partial class DBContext : DbContext
             entity.Property(e => e.ColorName)
                 .HasMaxLength(10)
                 .HasColumnName("color_name");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
             entity.Property(e => e.Status)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("status");
@@ -227,6 +234,95 @@ public partial class DBContext : DbContext
                 .HasColumnName("type")
                 .UseCollation("utf8_general_ci")
                 .HasCharSet("utf8");
+        });
+
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("order");
+
+            entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.AddressUuid)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("address_uuid");
+            entity.Property(e => e.Code)
+                .HasMaxLength(50)
+                .HasColumnName("code");
+            entity.Property(e => e.State)
+                .HasComment("0-Xác nhận đơn hàng, 1-Đang giao hàng,2-Giao thành công")
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("state");
+            entity.Property(e => e.Status)
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("status");
+            entity.Property(e => e.TimeCreated)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("current_timestamp()")
+                .HasColumnType("timestamp")
+                .HasColumnName("time_created");
+            entity.Property(e => e.TotalPrice)
+                .HasColumnType("double(11,2)")
+                .HasColumnName("total_price");
+            entity.Property(e => e.Uuid)
+                .HasMaxLength(36)
+                .HasDefaultValueSql("uuid()")
+                .IsFixedLength()
+                .HasColumnName("uuid");
+        });
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("order_item");
+
+            entity.HasIndex(e => e.OrderUuid, "fk_order_uuid_oi");
+
+            entity.HasIndex(e => e.ProductVariantUuid, "fk_pv_uuid_oi");
+
+            entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.OrderUuid)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("order_uuid");
+            entity.Property(e => e.Price)
+                .HasColumnType("double(11,2)")
+                .HasColumnName("price");
+            entity.Property(e => e.ProductVariantUuid)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("product_variant_uuid");
+            entity.Property(e => e.Quantity)
+                .HasColumnType("int(11)")
+                .HasColumnName("quantity");
+            entity.Property(e => e.Status)
+                .HasColumnType("tinyint(4)")
+                .HasColumnName("status");
+            entity.Property(e => e.Uuid)
+                .HasMaxLength(36)
+                .HasDefaultValueSql("uuid()")
+                .IsFixedLength()
+                .HasColumnName("uuid");
+
+            entity.HasOne(d => d.OrderUu).WithMany(p => p.OrderItem)
+                .HasPrincipalKey(p => p.Uuid)
+                .HasForeignKey(d => d.OrderUuid)
+                .HasConstraintName("fk_order_uuid_oi");
+
+            entity.HasOne(d => d.ProductVariantUu).WithMany(p => p.OrderItem)
+                .HasPrincipalKey(p => p.Uuid)
+                .HasForeignKey(d => d.ProductVariantUuid)
+                .HasConstraintName("fk_pv_uuid_oi");
         });
 
         modelBuilder.Entity<Product>(entity =>
@@ -448,6 +544,9 @@ public partial class DBContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
             entity.Property(e => e.SizeName)
                 .HasMaxLength(5)
                 .HasColumnName("size_name");

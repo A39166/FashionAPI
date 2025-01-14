@@ -11,6 +11,8 @@ public partial class Size
 
     public string SizeName { get; set; } = null!;
 
+    public string Description { get; set; } = null!;
+
     public DateTime TimeCreated { get; set; }
 
     public sbyte Status { get; set; }

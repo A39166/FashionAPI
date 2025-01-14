@@ -7,5 +7,6 @@ namespace FashionAPI.Models.Request
     public class UpsertSizeRequest : UuidRequest
     {
         public string SizeName { get; set; }
+        public string Description { get; set; }
     }
 }

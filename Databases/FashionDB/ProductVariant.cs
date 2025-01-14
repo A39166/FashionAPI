@@ -23,6 +23,8 @@ public partial class ProductVariant
 
     public virtual Color ColorUu { get; set; } = null!;
 
+    public virtual ICollection<OrderItem> OrderItem { get; set; } = new List<OrderItem>();
+
     public virtual Product ProductUu { get; set; } = null!;
 
     public virtual Size SizeUu { get; set; } = null!;

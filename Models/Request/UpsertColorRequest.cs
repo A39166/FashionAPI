@@ -8,5 +8,6 @@ namespace FashionAPI.Models.Request
     {
         public string ColorName { get; set; }
         public string Code { get; set; }
+        public string Description { get; set; }
     }
 }
