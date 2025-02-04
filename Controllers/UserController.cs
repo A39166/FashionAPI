@@ -155,8 +155,6 @@ namespace FashionAPI.Controllers
                     user.Gender = request.Gender;
                     user.Birthday = request.Birthday;
                     user.PhoneNumber = request.PhoneNumber;
-                    user.Role = request.Role;
-                    user.Status = request.Status;
                     _context.User.Update(user);
                     _context.SaveChanges();
                 }
