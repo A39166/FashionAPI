@@ -232,10 +232,7 @@ namespace FashionAPI.Controllers
             {
                 return Unauthorized();
             }
-            if(validToken.Role != 0)
-            {
-                throw new ErrorException(ErrorCode.NO_PERMISSION_ACTION);
-            }
+
 
             try
             {
@@ -497,38 +494,6 @@ namespace FashionAPI.Controllers
             }
         }
 
-        public class OtpService
-        {
-            private static readonly Dictionary<string, (string Otp, DateTime Expiry)> OtpStorage = new Dictionary<string, (string, DateTime)>();
-            private static readonly string FixedOtp = "123456"; // Mã OTP cố định
-            private const int OtpExpiryMinutes = 1; // Thời gian hết hạn của mã OTP
-
-            public static string GenerateAndStoreOtp(string email)
-            {
-                DateTime expiryTime = DateTime.Now.AddMinutes(OtpExpiryMinutes);
-                OtpStorage[email] = (FixedOtp, expiryTime);
-                return FixedOtp;
-            }
-
-            public static bool ValidateOtp(string email, string otp)
-            {
-                return otp == FixedOtp;
-            }
-            public static bool IsOtpExpired(string email, string otp)
-            {
-                // Lấy thời điểm tạo OTP
-                if (OtpStorage.TryGetValue(email, out var otpData) && otpData.Otp == otp)
-                {
-                    DateTime otpCreationTime = otpData.Expiry;
-                    // Tính thời gian đã trôi qua từ khi tạo OTP đến hiện tại
-                    var timeElapsed = DateTime.Now;
-                    // Kiểm tra xem thời gian đã trôi qua có vượt quá thời hạn của OTP không
-                    return timeElapsed > otpCreationTime;
-                }
-                // Trả về true nếu không thể tìm thấy thời gian tạo OTP
-                return true;
-            }
-        }
         [HttpPost("update-user-role")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateUserRole Response")]
         public async Task<IActionResult> UpdateUserRole(UuidRequest request)
@@ -540,7 +505,7 @@ namespace FashionAPI.Controllers
             {
                 return Unauthorized();
             }
-            CheckAdminPermission(validToken);
+
 
             try
             {
@@ -574,6 +539,42 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+
+
+
+        public class OtpService
+        {
+            private static readonly Dictionary<string, (string Otp, DateTime Expiry)> OtpStorage = new Dictionary<string, (string, DateTime)>();
+            private static readonly string FixedOtp = "123456"; // Mã OTP cố định
+            private const int OtpExpiryMinutes = 1; // Thời gian hết hạn của mã OTP
+
+            public static string GenerateAndStoreOtp(string email)
+            {
+                DateTime expiryTime = DateTime.Now.AddMinutes(OtpExpiryMinutes);
+                OtpStorage[email] = (FixedOtp, expiryTime);
+                return FixedOtp;
+            }
+
+            public static bool ValidateOtp(string email, string otp)
+            {
+                return otp == FixedOtp;
+            }
+            public static bool IsOtpExpired(string email, string otp)
+            {
+                // Lấy thời điểm tạo OTP
+                if (OtpStorage.TryGetValue(email, out var otpData) && otpData.Otp == otp)
+                {
+                    DateTime otpCreationTime = otpData.Expiry;
+                    // Tính thời gian đã trôi qua từ khi tạo OTP đến hiện tại
+                    var timeElapsed = DateTime.Now;
+                    // Kiểm tra xem thời gian đã trôi qua có vượt quá thời hạn của OTP không
+                    return timeElapsed > otpCreationTime;
+                }
+                // Trả về true nếu không thể tìm thấy thời gian tạo OTP
+                return true;
+            }
+        }
+        
 
     }
 }

@@ -5,7 +5,6 @@
         public string Token { get; set; }
         public string UserName { get; set; }
         public string UserUuid { get; set; } = string.Empty;
-        public sbyte Role { get; set; }
 
         private DateTime ExpiredDate { get; set; }
 

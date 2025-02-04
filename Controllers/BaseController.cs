@@ -37,8 +37,7 @@ namespace FashionAPI.Controllers
                     {
                         Token = session.Uuid,
                         UserName = session.UserUu.Email,
-                        UserUuid = session.UserUuid,
-                        Role = session.UserUu.Role
+                        UserUuid = session.UserUuid
                     };
 
                     TokenManager.addToken(_token);
@@ -49,31 +48,6 @@ namespace FashionAPI.Controllers
 
             return null;
         }
-
-        /*protected bool checkEmailOtp(DBContext _context, string email, string otp, string accActived, string note)
-        {
-            var result = false;
-            var checkOtp = _context.OtpEmail.Where(x => x.Email.Equals(email) && x.Otp.Equals(otp) && x.Status == 0).FirstOrDefault();
-
-            if (checkOtp != null)
-            {
-                checkOtp.Status = 1;
-                checkOtp.AccountUuid = accActived;
-                checkOtp.Notes = note;
-
-                _context.SaveChanges();
-
-                result = true;
-            }
-
-            //TODO: Remove late
-            if (otp.Equals("123456"))
-            {
-                return true;
-            }
-
-            return result;
-        }*/
 
         protected void logOutAllSession(DBContext _context, string userUuid)
         {
@@ -115,11 +89,12 @@ namespace FashionAPI.Controllers
             return null;
 
         }
-        protected void CheckAdminPermission(TokenInfo validToken)
+        protected void CheckLockedAccount(TokenInfo validToken, DbSet<User> user)
         {
-            if (validToken.Role != 0)
+            var locked = user.Where(x => x.Uuid == validToken.UserUuid).Select(s => s.Status).FirstOrDefault();
+            if (locked == 0)
             {
-                throw new ErrorException(ErrorCode.NO_PERMISSION_ACTION);
+                throw new ErrorException(ErrorCode.LOCKED_ACCOUNT);
             }
         }
     }

@@ -241,49 +241,6 @@ namespace FashionAPI.Controllers
             }
         }
 
-        [HttpPost("get-parent-category")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetParentCategory Response")]
-        public async Task<IActionResult> GetParentCategory(BaseKeywordRequest request)
-        {
-            var response = new BaseResponseMessageItem<ShortCategoryDTO>();
-
-            var validToken = validateToken(_context);
-            if (validToken is null)
-            {
-                return Unauthorized();
-            }
-            try
-            {
-                var parent = _context.Category.Where(x => string.IsNullOrEmpty(request.Keyword)
-                                                        || EF.Functions.Like(x.Name + " ", $"%{request.Keyword}%"))
-                                              .Where(x => string.IsNullOrEmpty(x.ParentUuid))
-                                                 .ToList();
-                if(parent!= null)
-                {
-                    response.Data = parent.Select(p => new ShortCategoryDTO
-                    {
-                        Uuid = p.Uuid,
-                        Name = p.Name,
-                        Status = p.Status
-                    }).ToList();
-                }
-                return Ok(response);
-            }
-            catch (ErrorException ex)
-            {
-                response.error.SetErrorCode(ex.Code);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
-                _logger.LogError(ex.Message);
-
-                return BadRequest(response);
-            }
-        }
-
-
         private List<Category> BuildCategoryListByParent(List<Category> categories)
         {
             var result = new List<Category>();
