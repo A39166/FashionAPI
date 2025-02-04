@@ -119,6 +119,7 @@ namespace FashionAPI.Controllers
                         {
                             Uuid = color.Uuid,
                             ColorName = color.ColorName,
+                            Code = color.Code,
                             Description = color.Description,
                             TimeCreated = color.TimeCreated,
                             Status = color.Status,
@@ -170,6 +171,7 @@ namespace FashionAPI.Controllers
                     {
                         Uuid = colordetail.Uuid,
                         ColorName = colordetail.ColorName,
+                        Code = colordetail.Code,
                         Description = colordetail.Description,
                         TimeCreated = colordetail.TimeCreated,
                         Status = colordetail.Status,
