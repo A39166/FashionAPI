@@ -223,7 +223,7 @@ namespace FashionAPI.Controllers
         }
         [HttpPost("update-user-status")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateUserStatus Response")]
-        public async Task<IActionResult> UpdateUserStatus(UpdateStatusRequest request)
+        public async Task<IActionResult> UpdateUserStatus(UuidRequest request)
         {
             var response = new BaseResponse();
 
@@ -245,7 +245,14 @@ namespace FashionAPI.Controllers
                     throw new ErrorException(ErrorCode.USER_NOTFOUND);
                 }
 
-                user.Status = request.Status;
+                if(user.Status == 1)
+                {
+                    user.Status = 0;
+                }
+                else
+                {
+                    user.Status = 1;
+                }
                 _context.SaveChanges();
                 return Ok(response);
             }
@@ -524,7 +531,7 @@ namespace FashionAPI.Controllers
         }
         [HttpPost("update-user-role")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateUserRole Response")]
-        public async Task<IActionResult> UpdateUserRole(UpdateRoleRequest request)
+        public async Task<IActionResult> UpdateUserRole(UuidRequest request)
         {
             var response = new BaseResponse();
 
@@ -533,10 +540,7 @@ namespace FashionAPI.Controllers
             {
                 return Unauthorized();
             }
-            if (validToken.Role != 0)
-            {
-                throw new ErrorException(ErrorCode.NO_PERMISSION_ACTION);
-            }
+            CheckAdminPermission(validToken);
 
             try
             {
@@ -546,7 +550,14 @@ namespace FashionAPI.Controllers
                     throw new ErrorException(ErrorCode.USER_NOTFOUND);
                 }
 
-                user.Role = request.Role;
+                if (user.Role == 1)
+                {
+                    user.Role = 0;
+                }
+                else
+                {
+                    user.Role = 1;
+                }
                 _context.SaveChanges();
                 return Ok(response);
             }

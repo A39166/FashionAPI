@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.EntityFrameworkCore;
 using FashionAPI.Databases.FashionDB;
+using FashionAPI.Configuaration;
+using FashionAPI.Enums;
+using Newtonsoft.Json.Linq;
 
 namespace FashionAPI.Controllers
 {
@@ -111,6 +114,13 @@ namespace FashionAPI.Controllers
 
             return null;
 
+        }
+        protected void CheckAdminPermission(TokenInfo validToken)
+        {
+            if (validToken.Role != 0)
+            {
+                throw new ErrorException(ErrorCode.NO_PERMISSION_ACTION);
+            }
         }
     }
 
