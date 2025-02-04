@@ -234,10 +234,14 @@ namespace FashionAPI.Controllers
             {
                 return Unauthorized();
             }
+            if(validToken.Role != 0)
+            {
+                throw new ErrorException(ErrorCode.NO_PERMISSION_ACTION);
+            }
 
             try
             {
-                var user = _context.User.Where(x => x.Uuid == request.Uuid).SingleOrDefault(); ;
+                var user = _context.User.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
                 if (user == null)
                 {
                     throw new ErrorException(ErrorCode.USER_NOTFOUND);
@@ -518,6 +522,47 @@ namespace FashionAPI.Controllers
                 }
                 // Trả về true nếu không thể tìm thấy thời gian tạo OTP
                 return true;
+            }
+        }
+        [HttpPost("update-user-role")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateUserRole Response")]
+        public async Task<IActionResult> UpdateUserRole(UpdateRoleRequest request)
+        {
+            var response = new BaseResponse();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+            if (validToken.Role != 0)
+            {
+                throw new ErrorException(ErrorCode.NO_PERMISSION_ACTION);
+            }
+
+            try
+            {
+                var user = _context.User.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                if (user == null)
+                {
+                    throw new ErrorException(ErrorCode.USER_NOTFOUND);
+                }
+
+                user.Role = request.Role;
+                _context.SaveChanges();
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
             }
         }
 

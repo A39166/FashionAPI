@@ -4,7 +4,7 @@ using Microsoft.OpenApi.Models;
 using FashionAPI.Extensions;
 using FashionAPI.Configuaration;
 using Microsoft.Extensions.FileProviders;
-using CinemaAPI.Extensions;
+using FashionAPI.Extensions;
 
 
 var builder = WebApplication.CreateBuilder(args);

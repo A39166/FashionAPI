@@ -69,5 +69,8 @@ namespace FashionAPI.Enums
 
         [Description("Màu đã có!")]
         DUPLICATE_COLOR = 33,
+
+        [Description("Tài khoản này không có quyền đăng nhập Admin!")]
+        NO_PERMISSION_ACTION = 34,
     }
 }

@@ -1,7 +1,7 @@
 ﻿using FashionAPI.Databases.FashionDB;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
-namespace CinemaAPI.Extensions
+namespace FashionAPI.Extensions
 {
     public static class ServiceExtension
     {

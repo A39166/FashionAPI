@@ -34,7 +34,8 @@ namespace FashionAPI.Controllers
                     {
                         Token = session.Uuid,
                         UserName = session.UserUu.Email,
-                        UserUuid = session.UserUuid
+                        UserUuid = session.UserUuid,
+                        Role = session.UserUu.Role
                     };
 
                     TokenManager.addToken(_token);
