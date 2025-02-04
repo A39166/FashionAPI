@@ -410,7 +410,7 @@ namespace FashionAPI.Controllers
                 var account = _context.User.FirstOrDefault(x => x.Email == request.Email);
                 if (account == null)
                 {
-                    response.error.SetErrorCode(ErrorCode.ACCOUNT_NOTFOUND, "Tài khoản không tồn tại. Vui lòng kiểm tra lại");
+                    response.error.SetErrorCode(ErrorCode.ACCOUNT_NOTFOUND);
                     return BadRequest(response);
                 }
                 var otp = OtpService.GenerateAndStoreOtp(request.Email);
