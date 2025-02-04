@@ -48,21 +48,7 @@ namespace FashionAPI.Controllers.v1
                     {
                         Directory.CreateDirectory(GlobalSettings.FOLDER_EXPORT);
                     }
-
-                    var folderSavePath = "";
-
-                    if (request.Type == 1)
-                    {
-                        folderSavePath = $"{GlobalSettings.FOLDER_EXPORT}/{GlobalSettings.SUB_FOLDER_AVATAR}";
-                    }
-                    else if (request.Type == 2)
-                    {
-                        folderSavePath = $"{GlobalSettings.FOLDER_EXPORT}/{GlobalSettings.SUB_FOLDER_PRODUCT}";
-                    }
-                    else if (request.Type == 3)
-                    {
-                        folderSavePath = $"{GlobalSettings.FOLDER_EXPORT}/{GlobalSettings.SUB_FOLDER_CATEGORY}";
-                    }
+                    var folderSavePath = $"{GlobalSettings.FOLDER_EXPORT}"; 
 
                     if (!Directory.Exists(folderSavePath))
                     {

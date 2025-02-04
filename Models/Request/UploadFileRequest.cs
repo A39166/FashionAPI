@@ -6,6 +6,5 @@ namespace FashionAPI.Models.Request
     {
         [Required]
         public IFormFile FileData { get; set; }
-        public sbyte Type { get; set; }
     }
 }
