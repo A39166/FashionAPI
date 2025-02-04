@@ -210,7 +210,14 @@ namespace FashionAPI.Controllers
 
                 if (color != null)
                 {
-                    color.Status = request.Status;
+                    if (color.Status == 1)
+                    {
+                        color.Status = 0;
+                    }
+                    else
+                    {
+                        color.Status = 1;
+                    }
                     _context.SaveChanges();
                 }
                 else
