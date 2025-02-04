@@ -32,7 +32,7 @@ public partial class User
     public DateTime TimeCreated { get; set; }
 
     /// <summary>
-    /// 0 - không sử dụng, 1 - hoạt động, 2 - đang khóa
+    /// 0 - đang khóa, 1 - hoạt động
     /// </summary>
     public sbyte Status { get; set; }
 

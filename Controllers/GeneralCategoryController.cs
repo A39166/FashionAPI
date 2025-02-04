@@ -117,7 +117,7 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        [HttpPost("get-parent-category")]
+        /*[HttpPost("get-parent-category")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetParentCategory Response")]
         public async Task<IActionResult> GetParentCategory(BaseKeywordRequest request)
         {
@@ -157,7 +157,7 @@ namespace FashionAPI.Controllers
 
                 return BadRequest(response);
             }
-        }
+        }*/
 
     }
 }

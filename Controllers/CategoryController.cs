@@ -9,6 +9,7 @@ using FashionAPI.Models.BaseRequest;
 using FashionAPI.Models.DataInfo;
 using FashionAPI.Extensions;
 using FashionAPI.Configuaration;
+using System.Drawing;
 
 namespace FashionAPI.Controllers
 {
@@ -46,8 +47,8 @@ namespace FashionAPI.Controllers
                     var category = new Category()
                     {
                         Uuid = Guid.NewGuid().ToString(),
-                        ParentUuid = string.IsNullOrEmpty(request.ParentUuid) ? null : request.ParentUuid,
                         Name = request.CategoryName,
+                        Path = request.Path,
                         TimeCreated = DateTime.Now,
                         Status = 1,
                     };
@@ -60,8 +61,8 @@ namespace FashionAPI.Controllers
                     var category = _context.Category.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
                     if (category != null)
                     {
-                        category.ParentUuid = string.IsNullOrEmpty(request.ParentUuid) ? null : request.ParentUuid;
                         category.Name = request.CategoryName;
+                        category.Path = request.Path;
                         _context.SaveChanges();
                     }
                     else
@@ -102,8 +103,7 @@ namespace FashionAPI.Controllers
 
                 if (lstCategory != null && lstCategory.Count > 0)
                 {
-                    var sorted = BuildCategoryListByParent(lstCategory);
-                    var result = sorted.TakePage(request.Page, request.PageSize);
+                    var result = lstCategory.OrderByDescending(x => x.Id).TakePage(request.Page, request.PageSize);
                     if (result != null && result.Count > 0)
                     {
                         response.Data.Items = new List<CategoryDTO>();
@@ -113,8 +113,8 @@ namespace FashionAPI.Controllers
                         var convertItemDTO = new CategoryDTO()
                         {
                             Uuid = cat.Uuid,
-                            ParentUuid = cat.ParentUuid,
                             CategoryName = cat.Name,
+                            Path = cat.Path,
                             TimeCreated = cat.TimeCreated,
                             Status = cat.Status,
                         };
@@ -165,8 +165,8 @@ namespace FashionAPI.Controllers
                     response.Data = new CategoryDTO()
                     {
                         Uuid = detail.Uuid,
-                        ParentUuid = detail.ParentUuid,
                         CategoryName = detail.Name,
+                        Path = detail.Path,
                         TimeCreated = detail.TimeCreated,
                         Status = detail.Status,
                     };
@@ -188,7 +188,7 @@ namespace FashionAPI.Controllers
         }
         [HttpPost("update-category-status")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateCategoryStatus Response")]
-        public async Task<IActionResult> UpdateCategoryStatus(UpdateStatusRequest request)
+        public async Task<IActionResult> UpdateCategoryStatus(UuidRequest request)
         {
             var response = new BaseResponse();
 
@@ -204,21 +204,16 @@ namespace FashionAPI.Controllers
 
                 if (category != null)
                 {
-                    if(!string.IsNullOrEmpty(category.ParentUuid))
-                    {
-                        category.Status = request.Status;
-                        _context.SaveChanges();
-                    }
-                    else
-                    {
-                        var lstChild = _context.Category.Where(x => x.ParentUuid == category.Uuid).ToList();
-                        foreach(var child in lstChild)
+                    
+                        if (category.Status == 1)
                         {
-                            child.Status = request.Status;
+                            category.Status = 0;
                         }
-                        category.Status = request.Status;
-                        _context.SaveChanges();
-                    }    
+                        else
+                        {
+                            category.Status = 1;
+                        }
+                        _context.SaveChanges();  
                     
                 }
                 else
@@ -241,32 +236,6 @@ namespace FashionAPI.Controllers
             }
         }
 
-        private List<Category> BuildCategoryListByParent(List<Category> categories)
-        {
-            var result = new List<Category>();
-            var categoryDict = categories.ToDictionary(c => c.Uuid); // Từ điển để tra cứu nhanh
-
-            // Tìm các mục không có cha (cấp cao nhất)
-            var roots = categories.Where(c => string.IsNullOrEmpty(c.ParentUuid) || !categoryDict.ContainsKey(c.ParentUuid)).ToList();
-
-            // Duyệt qua các mục gốc và thêm vào danh sách theo thứ tự cha trước, con sau
-            foreach (var root in roots)
-            {
-                AddCategoryAndChildren(root, categories, result);
-            }
-
-            return result;
-        }
-
-        private void AddCategoryAndChildren(Category category, List<Category> categories, List<Category> result)
-        {
-            result.Add(category);
-
-            var children = categories.Where(c => c.ParentUuid == category.Uuid).OrderBy(c => c.Name).ToList();
-            foreach (var child in children)
-            {
-                AddCategoryAndChildren(child, categories, result);
-            }
-        }
+        
     }
 }

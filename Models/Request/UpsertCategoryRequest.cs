@@ -6,8 +6,7 @@ namespace FashionAPI.Models.Request
 {
     public class UpsertCategoryRequest : UuidRequest
     {
-        public string? ParentUuid { get; set; }
         public string CategoryName { get; set; }
-
+        public string Path { get; set; }
     }
 }

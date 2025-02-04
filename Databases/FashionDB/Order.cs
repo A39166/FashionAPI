@@ -24,5 +24,7 @@ public partial class Order
 
     public sbyte Status { get; set; }
 
+    public virtual UserAddress AddressUu { get; set; } = null!;
+
     public virtual ICollection<OrderItem> OrderItem { get; set; } = new List<OrderItem>();
 }

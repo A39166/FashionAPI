@@ -59,6 +59,10 @@ namespace FashionAPI.Controllers.v1
                     {
                         folderSavePath = $"{GlobalSettings.FOLDER_EXPORT}/{GlobalSettings.SUB_FOLDER_PRODUCT}";
                     }
+                    else if (request.Type == 3)
+                    {
+                        folderSavePath = $"{GlobalSettings.FOLDER_EXPORT}/{GlobalSettings.SUB_FOLDER_CATEGORY}";
+                    }
 
                     if (!Directory.Exists(folderSavePath))
                     {

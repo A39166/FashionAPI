@@ -17,5 +17,6 @@
         public static readonly string FOLDER_EXPORT = "resources";
         public static readonly string SUB_FOLDER_PRODUCT = "products";
         public static readonly string SUB_FOLDER_AVATAR = "avatar";
+        public static readonly string SUB_FOLDER_CATEGORY = "category";
     }
 }

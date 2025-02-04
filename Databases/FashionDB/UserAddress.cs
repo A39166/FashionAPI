@@ -34,6 +34,8 @@ public partial class UserAddress
 
     public virtual Province MatpNavigation { get; set; } = null!;
 
+    public virtual ICollection<Order> Order { get; set; } = new List<Order>();
+
     public virtual User UserUu { get; set; } = null!;
 
     public virtual Ward Xa { get; set; } = null!;

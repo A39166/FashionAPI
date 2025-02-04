@@ -137,8 +137,6 @@ public partial class DBContext : DbContext
 
             entity.ToTable("category");
 
-            entity.HasIndex(e => e.ParentUuid, "fk_parent_uuid_cat");
-
             entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
 
             entity.Property(e => e.Id)
@@ -147,10 +145,9 @@ public partial class DBContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
-            entity.Property(e => e.ParentUuid)
-                .HasMaxLength(36)
-                .IsFixedLength()
-                .HasColumnName("parent_uuid");
+            entity.Property(e => e.Path)
+                .HasMaxLength(255)
+                .HasColumnName("path");
             entity.Property(e => e.Status)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("status");
@@ -163,12 +160,6 @@ public partial class DBContext : DbContext
                 .HasDefaultValueSql("uuid()")
                 .IsFixedLength()
                 .HasColumnName("uuid");
-
-            entity.HasOne(d => d.ParentUu).WithMany(p => p.InverseParentUu)
-                .HasPrincipalKey(p => p.Uuid)
-                .HasForeignKey(d => d.ParentUuid)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("fk_parent_uuid_cat");
         });
 
         modelBuilder.Entity<Color>(entity =>
@@ -183,7 +174,7 @@ public partial class DBContext : DbContext
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
             entity.Property(e => e.Code)
-                .HasMaxLength(5)
+                .HasColumnType("text")
                 .HasColumnName("code");
             entity.Property(e => e.ColorName)
                 .HasMaxLength(10)
@@ -242,6 +233,8 @@ public partial class DBContext : DbContext
 
             entity.ToTable("order");
 
+            entity.HasIndex(e => e.AddressUuid, "fk_address_uuid_order");
+
             entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
 
             entity.Property(e => e.Id)
@@ -274,6 +267,12 @@ public partial class DBContext : DbContext
                 .HasDefaultValueSql("uuid()")
                 .IsFixedLength()
                 .HasColumnName("uuid");
+
+            entity.HasOne(d => d.AddressUu).WithMany(p => p.Order)
+                .HasPrincipalKey(p => p.Uuid)
+                .HasForeignKey(d => d.AddressUuid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_address_uuid_order");
         });
 
         modelBuilder.Entity<OrderItem>(entity =>
@@ -602,7 +601,7 @@ public partial class DBContext : DbContext
                 .HasColumnName("role");
             entity.Property(e => e.Status)
                 .HasDefaultValueSql("'1'")
-                .HasComment("0 - không sử dụng, 1 - hoạt động, 2 - đang khóa")
+                .HasComment("0 - đang khóa, 1 - hoạt động")
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("status");
             entity.Property(e => e.TimeCreated)
