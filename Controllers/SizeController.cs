@@ -15,6 +15,7 @@ using static System.Net.Mime.MediaTypeNames;
 using FashionAPI.Configuaration;
 using FashionAPI.Models.BaseRequest;
 using FashionAPI.Utils;
+using Microsoft.VisualStudio.Services.Users;
 
 namespace FashionAPI.Controllers
 {
@@ -211,11 +212,18 @@ namespace FashionAPI.Controllers
 
             try
             {
-                var color = _context.Size.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                var size = _context.Size.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
 
-                if (color != null)
+                if (size != null)
                 {
-                    color.Status = request.Status;
+                    if (size.Status == 1)
+                    {
+                        size.Status = 0;
+                    }
+                    else
+                    {
+                        size.Status = 1;
+                    }
                     _context.SaveChanges();
                 }
                 else
