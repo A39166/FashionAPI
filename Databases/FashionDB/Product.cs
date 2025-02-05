@@ -13,7 +13,11 @@ public partial class Product
 
     public string Code { get; set; } = null!;
 
+    public string ColorUuid { get; set; } = null!;
+
     public string ProductName { get; set; } = null!;
+
+    public string? ShortDescription { get; set; }
 
     public string? Description { get; set; }
 
@@ -24,6 +28,8 @@ public partial class Product
     public sbyte Status { get; set; }
 
     public virtual Category CatUu { get; set; } = null!;
+
+    public virtual Color ColorUu { get; set; } = null!;
 
     public virtual ICollection<ProductImage> ProductImage { get; set; } = new List<ProductImage>();
 

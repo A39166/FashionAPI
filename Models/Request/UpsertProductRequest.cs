@@ -8,6 +8,7 @@ namespace FashionAPI.Models.Request
     {
         public string ColorName { get; set; }
         public string CatUuid { get; set; }
+        public string ColorUuid { get; set; }
         public string Code { get; set; }
         public string ProductName { get; set; }
         public string Description { get; set; }
@@ -19,7 +20,6 @@ namespace FashionAPI.Models.Request
     public class ProductVariant
     {
         public string SizeUuid { get; set; }
-        public string ColorUuid { get; set; }
         public int Stock { get; set; }
 
     }

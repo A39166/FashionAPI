@@ -117,9 +117,9 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        /*[HttpPost("get-parent-category")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetParentCategory Response")]
-        public async Task<IActionResult> GetParentCategory(BaseKeywordRequest request)
+        [HttpPost("get-category")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetCategory Response")]
+        public async Task<IActionResult> GetCategory(BaseKeywordRequest request)
         {
             var response = new BaseResponseMessageItem<ShortCategoryDTO>();
 
@@ -132,7 +132,6 @@ namespace FashionAPI.Controllers
             {
                 var parent = _context.Category.Where(x => string.IsNullOrEmpty(request.Keyword)
                                                         || EF.Functions.Like(x.Name + " ", $"%{request.Keyword}%"))
-                                              .Where(x => string.IsNullOrEmpty(x.ParentUuid))
                                                  .ToList();
                 if (parent != null)
                 {
@@ -157,7 +156,7 @@ namespace FashionAPI.Controllers
 
                 return BadRequest(response);
             }
-        }*/
+        }
 
     }
 }

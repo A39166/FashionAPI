@@ -8,6 +8,7 @@ using FashionAPI.Models.BaseRequest;
 using FashionAPI.Models.DataInfo;
 using FashionAPI.Extensions;
 using FashionAPI.Configuaration;
+using Microsoft.VisualStudio.Services.Users;
 
 namespace FashionAPI.Controllers
 {
@@ -45,6 +46,7 @@ namespace FashionAPI.Controllers
                     {
                         Uuid = Guid.NewGuid().ToString(),
                         CatUuid = request.CatUuid,
+                        ColorUuid = request.ColorUuid,
                         Code = request.Code,
                         ProductName =request.ProductName,
                         Description = request.Description,
@@ -65,7 +67,6 @@ namespace FashionAPI.Controllers
                                 Uuid = Guid.NewGuid().ToString(),
                                 ProductUuid = product.Uuid,
                                 SizeUuid = variant.SizeUuid,
-                                ColorUuid = variant.ColorUuid,
                                 Stock = variant.Stock,
                             };
                             _context.ProductVariant.Add(productVariant);
@@ -95,6 +96,7 @@ namespace FashionAPI.Controllers
                     {
                         product.CatUuid = request.CatUuid;
                         product.Code = request.Code;
+                        product.ColorUuid = request.ColorUuid;
                         product.ProductName = request.ProductName;
                         product.Description = request.Description;
                         product.Price = request.Price;
@@ -104,8 +106,8 @@ namespace FashionAPI.Controllers
                         {
                             foreach(var variant in request.Variants)
                             {
-                                var existVariant = _context.ProductVariant.Where(e => e.ProductUuid == product.Uuid && e.SizeUuid == variant.SizeUuid
-                                                                                && e.ColorUuid == variant.ColorUuid).FirstOrDefault();
+                                var existVariant = _context.ProductVariant.Where(e => e.ProductUuid == product.Uuid 
+                                                                                && e.SizeUuid == variant.SizeUuid).FirstOrDefault();
                                 if(existVariant != null)
                                 {
                                     variant.Stock = existVariant.Stock;
@@ -116,7 +118,6 @@ namespace FashionAPI.Controllers
                                     {
                                         ProductUuid = product.Uuid,
                                         SizeUuid = variant.SizeUuid,
-                                        ColorUuid = variant.ColorUuid,
                                         Stock = variant.Stock,
                                     };
                                     _context.ProductVariant.Add(productVariant);
@@ -258,11 +259,18 @@ namespace FashionAPI.Controllers
 
             try
             {
-                var color = _context.Color.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                var product = _context.Product.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
 
-                if (color != null)
+                if (product != null)
                 {
-                    color.Status = request.Status;
+                    if (product.Status == 1)
+                    {
+                        product.Status = 0;
+                    }
+                    else
+                    {
+                        product.Status = 1;
+                    }
                     _context.SaveChanges();
                 }
                 else

@@ -7,4 +7,9 @@ namespace FashionAPI.Models.Request
         [Required]
         public IFormFile FileData { get; set; }
     }
+
+    public class UploadMultipleFileRequest
+    {
+        public List<IFormFile> FileData { get; set; } = new List<IFormFile>(); // Hỗ trợ nhiều ảnh
+    }
 }

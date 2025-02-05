@@ -15,5 +15,7 @@ public partial class ProductImage
 
     public sbyte Status { get; set; }
 
+    public bool? IsDefault { get; set; }
+
     public virtual Product ProductUu { get; set; } = null!;
 }

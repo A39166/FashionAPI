@@ -332,6 +332,8 @@ public partial class DBContext : DbContext
 
             entity.HasIndex(e => e.CatUuid, "fk_cat_uuid_product");
 
+            entity.HasIndex(e => e.ColorUuid, "fk_color_uuid_product");
+
             entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
 
             entity.Property(e => e.Id)
@@ -344,6 +346,10 @@ public partial class DBContext : DbContext
             entity.Property(e => e.Code)
                 .HasMaxLength(50)
                 .HasColumnName("code");
+            entity.Property(e => e.ColorUuid)
+                .HasMaxLength(36)
+                .IsFixedLength()
+                .HasColumnName("color_uuid");
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
                 .HasColumnName("description");
@@ -353,6 +359,9 @@ public partial class DBContext : DbContext
             entity.Property(e => e.ProductName)
                 .HasMaxLength(50)
                 .HasColumnName("product_name");
+            entity.Property(e => e.ShortDescription)
+                .HasMaxLength(255)
+                .HasColumnName("short_description");
             entity.Property(e => e.Status)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("status");
@@ -370,6 +379,11 @@ public partial class DBContext : DbContext
                 .HasPrincipalKey(p => p.Uuid)
                 .HasForeignKey(d => d.CatUuid)
                 .HasConstraintName("fk_cat_uuid_product");
+
+            entity.HasOne(d => d.ColorUu).WithMany(p => p.Product)
+                .HasPrincipalKey(p => p.Uuid)
+                .HasForeignKey(d => d.ColorUuid)
+                .HasConstraintName("fk_color_uuid_product");
         });
 
         modelBuilder.Entity<ProductImage>(entity =>
@@ -385,6 +399,7 @@ public partial class DBContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
+            entity.Property(e => e.IsDefault).HasColumnName("is_default");
             entity.Property(e => e.Path)
                 .HasMaxLength(255)
                 .HasColumnName("path");
@@ -413,8 +428,6 @@ public partial class DBContext : DbContext
 
             entity.ToTable("product_variant");
 
-            entity.HasIndex(e => e.ColorUuid, "fk_color_uuid_pv");
-
             entity.HasIndex(e => e.ProductUuid, "fk_product_uuid_pv");
 
             entity.HasIndex(e => e.SizeUuid, "fk_size_uuid_pv");
@@ -424,10 +437,6 @@ public partial class DBContext : DbContext
             entity.Property(e => e.Id)
                 .HasColumnType("int(11)")
                 .HasColumnName("id");
-            entity.Property(e => e.ColorUuid)
-                .HasMaxLength(36)
-                .IsFixedLength()
-                .HasColumnName("color_uuid");
             entity.Property(e => e.ProductUuid)
                 .HasMaxLength(36)
                 .IsFixedLength()
@@ -447,11 +456,6 @@ public partial class DBContext : DbContext
                 .HasDefaultValueSql("uuid()")
                 .IsFixedLength()
                 .HasColumnName("uuid");
-
-            entity.HasOne(d => d.ColorUu).WithMany(p => p.ProductVariant)
-                .HasPrincipalKey(p => p.Uuid)
-                .HasForeignKey(d => d.ColorUuid)
-                .HasConstraintName("fk_color_uuid_pv");
 
             entity.HasOne(d => d.ProductUu).WithMany(p => p.ProductVariant)
                 .HasPrincipalKey(p => p.Uuid)

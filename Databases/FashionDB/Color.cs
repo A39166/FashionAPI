@@ -19,5 +19,5 @@ public partial class Color
 
     public sbyte Status { get; set; }
 
-    public virtual ICollection<ProductVariant> ProductVariant { get; set; } = new List<ProductVariant>();
+    public virtual ICollection<Product> Product { get; set; } = new List<Product>();
 }

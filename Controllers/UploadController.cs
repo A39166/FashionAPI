@@ -9,6 +9,7 @@ using FashionAPI.Models.Response;
 using FashionAPI.Models.Request;
 using FashionAPI.Configuaration;
 using FashionAPI.Enums;
+using System.Linq;
 
 namespace FashionAPI.Controllers.v1
 {
@@ -92,6 +93,78 @@ namespace FashionAPI.Controllers.v1
             return Ok(response);
         }
 
+        [HttpPut("upload-multiple-image")]
+        [Consumes("multipart/form-data")]
+        [RequestSizeLimit(50 * 1024 * 1024)] // Tăng giới hạn để cho phép nhiều file
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessage<List<string>>), description: "UploadMultipleImage Response")]
+        public async Task<IActionResult> UploadMultipleImage([FromForm] UploadMultipleFileRequest request)
+        {
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+
+            var response = new BaseResponseMessage<List<string>>()
+            {
+                Data = new List<string>()
+            };
+
+            try
+            {
+                if (request.FileData == null || request.FileData.Count == 0)
+                {
+                    response.error.SetErrorCode(ErrorCode.INVALID_PARAM);
+                    return Ok(response);
+                }
+
+                if (!Directory.Exists(GlobalSettings.FOLDER_EXPORT))
+                {
+                    Directory.CreateDirectory(GlobalSettings.FOLDER_EXPORT);
+                }
+
+                var folderSavePath = $"{GlobalSettings.FOLDER_EXPORT}";
+
+                if (!Directory.Exists(folderSavePath))
+                {
+                    Directory.CreateDirectory(folderSavePath);
+                }
+
+                foreach (var file in request.FileData)
+                {
+                    var ext = Path.GetExtension(file.FileName).ToLower();
+
+                    if (!GlobalSettings.IMAGES_UPLOAD_EXTENSIONS.Contains(ext))
+                    {
+                        response.error.SetErrorCode(ErrorCode.INVALID_PARAM);
+                        continue;
+                    }
+
+                    var newUuid = Guid.NewGuid().ToString();
+                    var filename = $"{newUuid}{ext}";
+                    var filePath = $"{folderSavePath}/{filename}";
+
+                    using (var stream = System.IO.File.Create(filePath))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    response.Data.Add(filePath);
+                }
+
+                if (response.Data.Count == 0)
+                {
+                    response.error.SetErrorCode(ErrorCode.INVALID_PARAM);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                response.error.SetErrorCode(ErrorCode.SYSTEM_ERROR);
+            }
+
+            return Ok(response);
+        }
     }
     
 }
