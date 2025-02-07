@@ -180,6 +180,7 @@ namespace FashionAPI.Controllers
                         var convertItemDTO = new PageListProductDTO()
                         {
                             Uuid = product.Uuid,
+                            ProductName = product.ProductName,
                             Code = product.Code,
                             ColorName = _context.Color.Where(p => p.Uuid == product.ColorUuid && p.Status == 1).Select(p => p.ColorName).FirstOrDefault(),
                             Selled = 0,
@@ -216,10 +217,10 @@ namespace FashionAPI.Controllers
             }
         }
         [HttpPost("product-detail")]
-        [SwaggerResponse(statusCode: 200, type: typeof(ColorDTO), description: "GetProductDetail Response")]
+        [SwaggerResponse(statusCode: 200, type: typeof(ProductDTO), description: "GetProductDetail Response")]
         public async Task<IActionResult> GetProductDetail(UuidRequest request)
         {
-            var response = new BaseResponseMessage<ColorDTO>();
+            var response = new BaseResponseMessage<ProductDTO>();
 
             var validToken = validateToken(_context);
             if (validToken is null)
@@ -231,15 +232,21 @@ namespace FashionAPI.Controllers
             {
                 //TODO: Write code late
 
-                var colordetail = _context.Color.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
-                if (colordetail != null)
+                var productdetail = _context.Product.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                if (productdetail != null)
                 {
-                    response.Data = new ColorDTO()
+                    response.Data = new ProductDTO()
                     {
-                        Uuid = colordetail.Uuid,
-                        ColorName = colordetail.ColorName,
-                        TimeCreated = colordetail.TimeCreated,
-                        Status = colordetail.Status,
+                        Uuid = productdetail.Uuid,
+                        CatUuid = productdetail.CatUuid,
+                        ColorUuid = productdetail.ColorUuid,
+                        Code = productdetail.Code,
+                        ProductName = productdetail.ProductName,
+                        ShortDescription = productdetail.ShortDescription,
+                        Description = productdetail.Description,
+                        Price = productdetail.Price,
+                        TimeCreated = productdetail.TimeCreated,
+                        Status = productdetail.Status,
                     };
 
                 }

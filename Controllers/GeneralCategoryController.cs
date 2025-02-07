@@ -16,6 +16,7 @@ using FashionAPI.Configuaration;
 using FashionAPI.Models.BaseRequest;
 using FashionAPI.Utils;
 using System.Linq;
+using ESDManagerApi.Models.Request;
 
 namespace FashionAPI.Controllers
 {
@@ -37,7 +38,7 @@ namespace FashionAPI.Controllers
 
         [HttpPost("get-color-category")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetColorCategory Response")]
-        public async Task<IActionResult> GetColorCategory(BaseKeywordRequest request)
+        public async Task<IActionResult> GetColorCategory(CategoryRequest request)
         {
             var response = new BaseResponseMessageItem<ShortCategoryDTO>();
 
@@ -50,8 +51,9 @@ namespace FashionAPI.Controllers
             {
                 var color = _context.Color.Where(x => string.IsNullOrEmpty(request.Keyword)
                                                         || EF.Functions.Like(x.ColorName + " ", $"%{request.Keyword}%"))
-                                                 .Where(x => x.Status == 1)
-                                                 .ToList();
+                                          .Where(x => string.IsNullOrEmpty(request.Uuid) || x.Uuid == request.Uuid)
+                                          .Where(x => x.Status == 1)
+                                          .ToList();
                 if (color != null)
                 {
                     response.Data = color.Select(p => new ShortCategoryDTO
@@ -78,7 +80,7 @@ namespace FashionAPI.Controllers
         }
         [HttpPost("get-size-category")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetSizeCategory Response")]
-        public async Task<IActionResult> GetSizeCategory(BaseKeywordRequest request)
+        public async Task<IActionResult> GetSizeCategory(CategoryRequest request)
         {
             var response = new BaseResponseMessageItem<ShortCategoryDTO>();
 
@@ -91,6 +93,7 @@ namespace FashionAPI.Controllers
             {
                 var color = _context.Size.Where(x => string.IsNullOrEmpty(request.Keyword)
                                                         || EF.Functions.Like(x.SizeName + " ", $"%{request.Keyword}%"))
+                                         .Where(x => string.IsNullOrEmpty(request.Uuid) || x.Uuid == request.Uuid)
                                                  .Where(x => x.Status == 1)
                                                  .ToList();
                 if (color != null)
@@ -119,7 +122,7 @@ namespace FashionAPI.Controllers
         }
         [HttpPost("get-category")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetCategory Response")]
-        public async Task<IActionResult> GetCategory(BaseKeywordRequest request)
+        public async Task<IActionResult> GetCategory(CategoryRequest request)
         {
             var response = new BaseResponseMessageItem<ShortCategoryDTO>();
 
@@ -132,6 +135,7 @@ namespace FashionAPI.Controllers
             {
                 var parent = _context.Category.Where(x => string.IsNullOrEmpty(request.Keyword)
                                                         || EF.Functions.Like(x.Name + " ", $"%{request.Keyword}%"))
+                                              .Where(x => string.IsNullOrEmpty(request.Uuid) || x.Uuid == request.Uuid)
                                                  .ToList();
                 if (parent != null)
                 {
