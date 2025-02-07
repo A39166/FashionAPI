@@ -28,6 +28,7 @@ namespace FashionAPI.Controllers
             _context = context;
             _logger = logger;
         }
+
         [HttpPost("upsert-product")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpsertProduct Response")]
         public async Task<IActionResult> UpsertProduct(UpsertProductRequest request)
@@ -128,6 +129,40 @@ namespace FashionAPI.Controllers
                                     };
                                     _context.ProductVariant.Add(productVariant);
                                 }
+
+                            }
+                            _context.SaveChanges();
+                        }
+                        if (request.ImagesPath != null)
+                        {
+                            var oldImages = _context.ProductImage
+                                .Where(img => img.ProductUuid == product.Uuid)
+                                .ToList();
+                            var imagesToDelete = oldImages
+                                .Where(img => !request.ImagesPath.Contains(img.Path))
+                                .ToList();
+                            _context.ProductImage.RemoveRange(imagesToDelete);
+
+                            bool isFirst = true;
+                            foreach (var image in request.ImagesPath)
+                            {
+                                var existingImage = oldImages.FirstOrDefault(img => img.Path == image);
+                                if (existingImage != null)
+                                {
+                                    existingImage.IsDefault = isFirst;
+                                }
+                                else
+                                {
+                                    var newImage = new ProductImage()
+                                    {
+                                        Uuid = Guid.NewGuid().ToString(),
+                                        ProductUuid = product.Uuid,
+                                        Path = image,
+                                        IsDefault = isFirst
+                                    };
+                                    _context.ProductImage.Add(newImage);
+                                }
+                                isFirst = false;
                             }
                             _context.SaveChanges();
                         }
