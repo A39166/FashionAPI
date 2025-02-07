@@ -86,7 +86,8 @@ namespace FashionAPI.Controllers
                                 Uuid = Guid.NewGuid().ToString(),
                                 ProductUuid = product.Uuid,
                                 Path = image,
-                                IsDefault = isFirst
+                                IsDefault = isFirst,
+                                Status = 1
                             };
                             _context.ProductImage.Add(imagepath);
                             isFirst = false;
@@ -158,7 +159,8 @@ namespace FashionAPI.Controllers
                                         Uuid = Guid.NewGuid().ToString(),
                                         ProductUuid = product.Uuid,
                                         Path = image,
-                                        IsDefault = isFirst
+                                        IsDefault = isFirst,
+                                        Status = 1
                                     };
                                     _context.ProductImage.Add(newImage);
                                 }
