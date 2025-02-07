@@ -71,6 +71,7 @@ namespace FashionAPI.Controllers
                                 ProductUuid = product.Uuid,
                                 SizeUuid = variant.SizeUuid,
                                 Stock = variant.Stock,
+                                Status = 1
                             };
                             _context.ProductVariant.Add(productVariant);
                         }
