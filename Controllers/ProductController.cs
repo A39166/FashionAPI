@@ -280,7 +280,7 @@ namespace FashionAPI.Controllers
         }
         [HttpPost("update-product-status")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateProductStatus Response")]
-        public async Task<IActionResult> UpdateProductStatus(UpdateStatusRequest request)
+        public async Task<IActionResult> UpdateProductStatus(UuidRequest request)
         {
             var response = new BaseResponse();
 
