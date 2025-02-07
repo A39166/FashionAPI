@@ -49,10 +49,7 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var color = _context.Color.Where(x => string.IsNullOrEmpty(request.Keyword)
-                                                        || EF.Functions.Like(x.ColorName + " ", $"%{request.Keyword}%"))
-                                          .Where(x => string.IsNullOrEmpty(request.Uuid) || x.Uuid == request.Uuid)
-                                          .Where(x => x.Status == 1)
+                var color = _context.Color.Where(x => x.Status == 1)
                                           .ToList();
                 if (color != null)
                 {
@@ -91,14 +88,10 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var color = _context.Size.Where(x => string.IsNullOrEmpty(request.Keyword)
-                                                        || EF.Functions.Like(x.SizeName + " ", $"%{request.Keyword}%"))
-                                         .Where(x => string.IsNullOrEmpty(request.Uuid) || x.Uuid == request.Uuid)
-                                                 .Where(x => x.Status == 1)
-                                                 .ToList();
-                if (color != null)
+                var size = _context.Size.Where(x => x.Status == 1).ToList();
+                if (size != null)
                 {
-                    response.Data = color.Select(p => new ShortCategoryDTO
+                    response.Data = size.Select(p => new ShortCategoryDTO
                     {
                         Uuid = p.Uuid,
                         Name = p.SizeName,
@@ -133,13 +126,11 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var parent = _context.Category.Where(x => string.IsNullOrEmpty(request.Keyword)
-                                                        || EF.Functions.Like(x.Name + " ", $"%{request.Keyword}%"))
-                                              .Where(x => string.IsNullOrEmpty(request.Uuid) || x.Uuid == request.Uuid)
+                var cat = _context.Category.Where(x => x.Status == 1)
                                                  .ToList();
-                if (parent != null)
+                if (cat != null)
                 {
-                    response.Data = parent.Select(p => new ShortCategoryDTO
+                    response.Data = cat.Select(p => new ShortCategoryDTO
                     {
                         Uuid = p.Uuid,
                         Name = p.Name,

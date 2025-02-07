@@ -232,9 +232,14 @@ namespace FashionAPI.Controllers
             {
                 //TODO: Write code late
 
-                var productdetail = _context.Product.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                var productdetail = _context.Product.Include(p => p.ProductVariant)
+                                                    .Where(x => x.Uuid == request.Uuid).SingleOrDefault();
                 if (productdetail != null)
                 {
+                    var productImages = _context.ProductImage.Where(img => img.ProductUuid == productdetail.Uuid && img.Status == 1)
+                                                             .OrderByDescending(img => img.IsDefault)
+                                                             .Select(img => img.Path)
+                                                             .ToList();
                     response.Data = new ProductDTO()
                     {
                         Uuid = productdetail.Uuid,
@@ -247,6 +252,15 @@ namespace FashionAPI.Controllers
                         Price = productdetail.Price,
                         TimeCreated = productdetail.TimeCreated,
                         Status = productdetail.Status,
+                        Variants = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
+                        .Select(v => new Models.Request.ProductVariant
+                        {
+                            SizeUuid = v.SizeUuid,
+                            Stock = v.Stock
+                        })
+                        .ToList(),
+                        ImagesPath = productImages
+
                     };
 
                 }
