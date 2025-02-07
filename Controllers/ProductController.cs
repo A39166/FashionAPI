@@ -9,6 +9,7 @@ using FashionAPI.Models.DataInfo;
 using FashionAPI.Extensions;
 using FashionAPI.Configuaration;
 using Microsoft.VisualStudio.Services.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace FashionAPI.Controllers
 {
@@ -49,6 +50,7 @@ namespace FashionAPI.Controllers
                         ColorUuid = request.ColorUuid,
                         Code = request.Code,
                         ProductName =request.ProductName,
+                        ShortDescription = request.ShortDescription,
                         Description = request.Description,
                         Price = request.Price,
                         TimeCreated = DateTime.Now,
@@ -75,6 +77,7 @@ namespace FashionAPI.Controllers
                     }
                     if(request.ImagesPath != null)
                     {
+                        bool isFirst = true;
                         foreach (var image in request.ImagesPath)
                         {
                             var imagepath = new ProductImage()
@@ -82,8 +85,10 @@ namespace FashionAPI.Controllers
                                 Uuid = Guid.NewGuid().ToString(),
                                 ProductUuid = product.Uuid,
                                 Path = image,
+                                IsDefault = isFirst
                             };
                             _context.ProductImage.Add(imagepath);
+                            isFirst = false;
                         }
                     }
                     _context.SaveChanges();
@@ -98,6 +103,7 @@ namespace FashionAPI.Controllers
                         product.Code = request.Code;
                         product.ColorUuid = request.ColorUuid;
                         product.ProductName = request.ProductName;
+                        product.ShortDescription = request.ShortDescription;
                         product.Description = request.Description;
                         product.Price = request.Price;
                         _context.Update(product);
@@ -159,24 +165,30 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var lstColor = _context.Color.ToList();
-                var totalcount = lstColor.Count();
+                var lstProduct = _context.Product.Include(x=> x.ProductVariant).ToList();
+                var totalcount = lstProduct.Count();
 
-                if (lstColor != null && lstColor.Count > 0)
+                if (lstProduct != null && lstProduct.Count > 0)
                 {
-                    var result = lstColor.OrderByDescending(x => x.Id).TakePage(request.Page, request.PageSize);
+                    var result = lstProduct.OrderByDescending(x => x.Id).TakePage(request.Page, request.PageSize);
                     if (result != null && result.Count > 0)
                     {
                         response.Data.Items = new List<PageListProductDTO>();
                     }
-                    foreach (var color in result)
+                    foreach (var product in result)
                     {
                         var convertItemDTO = new PageListProductDTO()
                         {
-                            Uuid = color.Uuid,
-                            ColorName = color.ColorName,
-                            TimeCreated = color.TimeCreated,
-                            Status = color.Status,
+                            Uuid = product.Uuid,
+                            Code = product.Code,
+                            ColorName = _context.Color.Where(p => p.Uuid == product.ColorUuid && p.Status == 1).Select(p => p.ColorName).FirstOrDefault(),
+                            Selled = 0,
+                            Price = product.Price,
+                            ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == product.Uuid && x.IsDefault == true).Select(x => x.Path).FirstOrDefault(),
+                            Size = _context.ProductVariant.Where(x => x.ProductUuid == product.Uuid).Join(_context.Size, pv => pv.SizeUuid, s => s.Uuid, (pv, s) => s.SizeName)
+                                    .Distinct()
+                                    .ToList(),
+                            Status = product.Status,
                         };
                         response.Data.Items.Add(convertItemDTO);
                     }

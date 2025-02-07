@@ -350,18 +350,14 @@ public partial class DBContext : DbContext
                 .HasMaxLength(36)
                 .IsFixedLength()
                 .HasColumnName("color_uuid");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
+            entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.Price)
                 .HasColumnType("double(10,2)")
                 .HasColumnName("price");
             entity.Property(e => e.ProductName)
                 .HasMaxLength(50)
                 .HasColumnName("product_name");
-            entity.Property(e => e.ShortDescription)
-                .HasMaxLength(255)
-                .HasColumnName("short_description");
+            entity.Property(e => e.ShortDescription).HasColumnName("short_description");
             entity.Property(e => e.Status)
                 .HasColumnType("tinyint(4)")
                 .HasColumnName("status");
