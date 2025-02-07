@@ -8,4 +8,10 @@
         public DateTime TimeCreated { get; set; }
         public sbyte Status { get; set; }
     }
+    public class ShortColorDTO : BaseDTO
+    {
+        public string ColorName { get; set; }
+        public string Code { get; set; }
+        public sbyte Status { get; set; }
+    }
 }

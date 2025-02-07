@@ -217,10 +217,17 @@ namespace FashionAPI.Controllers
                             Uuid = product.Uuid,
                             ProductName = product.ProductName,
                             Code = product.Code,
-                            Color = _context.Color.Where(p => p.Uuid == product.ColorUuid && p.Status == 1).Select(p => new ShortCategoryDTO
+                            Color = _context.Color.Where(p => p.Uuid == product.ColorUuid && p.Status == 1).Select(p => new ShortColorDTO
                             {
                                 Uuid = p.Uuid,
-                                Name = p.ColorName,
+                                ColorName = p.ColorName,
+                                Code = p.Code,
+                                Status = p.Status
+                            }).FirstOrDefault(),
+                            Category = _context.Category.Where(p => p.Uuid == product.CatUuid && p.Status == 1).Select(p => new ShortCategoryDTO
+                            {
+                                Uuid = p.Uuid,
+                                Name = p.Name,
                                 Status = p.Status
                             }).FirstOrDefault(),
                             Selled = 0,
