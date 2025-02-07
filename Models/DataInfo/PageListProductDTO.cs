@@ -6,12 +6,11 @@ namespace FashionAPI.Models.DataInfo
     {
         public string ProductName { get; set; }
         public string Code { get; set; }
-        public string ColorName { get; set; }
+        public ShortCategoryDTO Color { get; set; }
         [DefaultValue(0)]
         public int Selled {  get; set; }
         public double Price { get; set; }
         public string ImagesPath { get; set; }
-        public List<string> Size {  get; set; }
         public sbyte Status { get; set; }
     }
 }

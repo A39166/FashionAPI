@@ -217,13 +217,15 @@ namespace FashionAPI.Controllers
                             Uuid = product.Uuid,
                             ProductName = product.ProductName,
                             Code = product.Code,
-                            ColorName = _context.Color.Where(p => p.Uuid == product.ColorUuid && p.Status == 1).Select(p => p.ColorName).FirstOrDefault(),
+                            Color = _context.Color.Where(p => p.Uuid == product.ColorUuid && p.Status == 1).Select(p => new ShortCategoryDTO
+                            {
+                                Uuid = p.Uuid,
+                                Name = p.ColorName,
+                                Status = p.Status
+                            }).FirstOrDefault(),
                             Selled = 0,
                             Price = product.Price,
                             ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == product.Uuid && x.IsDefault == true).Select(x => x.Path).FirstOrDefault(),
-                            Size = _context.ProductVariant.Where(x => x.ProductUuid == product.Uuid).Join(_context.Size, pv => pv.SizeUuid, s => s.Uuid, (pv, s) => s.SizeName)
-                                    .Distinct()
-                                    .ToList(),
                             Status = product.Status,
                         };
                         response.Data.Items.Add(convertItemDTO);
