@@ -97,7 +97,6 @@ namespace FashionAPI.Controllers
                     _context.SaveChanges();
                 }
                 else
-                //cập nhập dữ liệu
                 {
                     var product = _context.Product.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
                     if (product != null)
@@ -132,7 +131,6 @@ namespace FashionAPI.Controllers
                                     };
                                     _context.ProductVariant.Add(productVariant);
                                 }
-
                             }
                             _context.SaveChanges();
                         }
@@ -278,8 +276,6 @@ namespace FashionAPI.Controllers
 
             try
             {
-                //TODO: Write code late
-
                 var productdetail = _context.Product.Include(p => p.ProductVariant)
                                                     .Where(x => x.Uuid == request.Uuid).SingleOrDefault();
                 if (productdetail != null)
@@ -305,6 +301,82 @@ namespace FashionAPI.Controllers
                         {
                             SizeUuid = v.SizeUuid,
                             Stock = v.Stock
+                        })
+                        .ToList(),
+                        ImagesPath = productImages
+
+                    };
+
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+                return BadRequest(response);
+            }
+        }
+
+        [HttpPost("full-product-detail")]
+        [SwaggerResponse(statusCode: 200, type: typeof(ProductDetailDTO), description: "GetFullProductDetail Response")]
+        public async Task<IActionResult> GetFullProductDetail(UuidRequest request)
+        {
+            var response = new BaseResponseMessage<ProductDetailDTO>();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var productdetail = _context.Product.Include(p => p.ProductVariant)
+                                                    .Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                if (productdetail != null)
+                {
+                    var productImages = _context.ProductImage.Where(img => img.ProductUuid == productdetail.Uuid && img.Status == 1)
+                                                             .OrderByDescending(img => img.IsDefault)
+                                                             .Select(img => img.Path)
+                                                             .ToList();
+                    response.Data = new ProductDetailDTO()
+                    {
+                        Uuid = productdetail.Uuid,
+                        Color = _context.Color.Where(p => p.Uuid == productdetail.ColorUuid && p.Status == 1).Select(p => new ShortColorDTO
+                        {
+                            Uuid = p.Uuid,
+                            ColorName = p.ColorName,
+                            Code = p.Code,
+                            Status = p.Status
+                        }).FirstOrDefault(),
+                        Category = _context.Category.Where(p => p.Uuid == productdetail.CatUuid && p.Status == 1).Select(p => new ShortCategoryDTO
+                        {
+                            Uuid = p.Uuid,
+                            Name = p.Name,
+                            Status = p.Status
+                        }).FirstOrDefault(),
+                        Code = productdetail.Code,
+                        ProductName = productdetail.ProductName,
+                        ShortDescription = productdetail.ShortDescription,
+                        Description = productdetail.Description,
+                        Price = productdetail.Price,
+                        TimeCreated = productdetail.TimeCreated,
+                        Status = productdetail.Status,
+                        Variants = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
+                        .Select(v => new Variant
+                        {
+                            Uuid = v.Uuid,
+                            SizeUuid = v.SizeUuid,
+                            SizeName = v.SizeUu.SizeName,
+                            Stock = v.Stock,
+                            Status = v.Status,
+                            
                         })
                         .ToList(),
                         ImagesPath = productImages
