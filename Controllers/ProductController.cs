@@ -119,7 +119,7 @@ namespace FashionAPI.Controllers
                                                                                 && e.SizeUuid == variant.SizeUuid).FirstOrDefault();
                                 if(existVariant != null)
                                 {
-                                    variant.Stock = existVariant.Stock;
+                                    existVariant.Stock = variant.Stock;
                                 }
                                 else
                                 {
@@ -128,6 +128,7 @@ namespace FashionAPI.Controllers
                                         ProductUuid = product.Uuid,
                                         SizeUuid = variant.SizeUuid,
                                         Stock = variant.Stock,
+                                        Status = 1
                                     };
                                     _context.ProductVariant.Add(productVariant);
                                 }
