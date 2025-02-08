@@ -12,7 +12,7 @@ namespace FashionAPI.Models.Request
         public DateOnly Birthday { get; set; }
         public string? PhoneNumber { get; set; }
     }
-    public class UpdateUserClientRequest : UuidRequest
+    public class UpdateUserClientRequest 
     {
 
         public string Fullname { get; set; }

@@ -185,7 +185,7 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var user = _context.User.Where(x => x.Uuid == request.Uuid).FirstOrDefault(); ;
+                var user = _context.User.Where(x => x.Uuid == validToken.UserUuid).FirstOrDefault(); ;
                 if (user == null)
                 {
                     throw new ErrorException(ErrorCode.USER_NOTFOUND);
@@ -323,7 +323,7 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var user = _context.User.Where(x => x.Uuid == request.Uuid).FirstOrDefault(); ;
+                var user = _context.User.Where(x => x.Uuid == validToken.UserUuid).FirstOrDefault(); ;
                 if (user == null)
                 {
                     throw new ErrorException(ErrorCode.USER_NOTFOUND);
