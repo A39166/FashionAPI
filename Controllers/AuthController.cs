@@ -70,6 +70,7 @@ namespace CinemaAPI.Controllers
                         Uuid = user.Uuid,
                         Email = user.Email,
                         Fullname = user.Fullname,
+                        PhoneNumber = user.PhoneNumber,
                         Gender = user.Gender,
                         Birthday = user.Birthday,
                         ImageUrl = user.Path,

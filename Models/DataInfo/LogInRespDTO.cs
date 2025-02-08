@@ -6,6 +6,7 @@
         public string Uuid { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string Fullname { get; set; } = null!;
+        public string PhoneNumber { get; set; } = null!;
         public sbyte Gender { get; set; }
         public DateOnly Birthday { get; set; }
         public string ImageUrl { get; set; } = null!;
