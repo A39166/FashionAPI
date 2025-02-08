@@ -297,10 +297,13 @@ namespace FashionAPI.Controllers
                         TimeCreated = productdetail.TimeCreated,
                         Status = productdetail.Status,
                         Variants = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
-                        .Select(v => new Models.Request.ProductVariant
+                        .Select(v => new Variant
                         {
+                            Uuid = v.Uuid,
                             SizeUuid = v.SizeUuid,
-                            Stock = v.Stock
+                            SizeName = v.SizeUu.SizeName,
+                            Stock = v.Stock,
+                            Status = v.Status,
                         })
                         .ToList(),
                         ImagesPath = productImages
