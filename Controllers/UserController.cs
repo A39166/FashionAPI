@@ -173,6 +173,50 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+        [HttpPost("update-profile-admin")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateProfileAdmin Response")]
+        public async Task<IActionResult> UpdateProfileAdmin(UpdateUserClientRequest request)
+        {
+            var response = new BaseResponse();
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var user = _context.User.Where(x => x.Uuid == request.Uuid).FirstOrDefault(); ;
+                if (user == null)
+                {
+                    throw new ErrorException(ErrorCode.USER_NOTFOUND);
+                }
+                else
+                {
+
+                    user.Fullname = request.Fullname;
+                    user.Gender = request.Gender;
+                    user.Birthday = request.Birthday;
+                    user.PhoneNumber = request.PhoneNumber;
+                    user.Path = request.Path;
+                    _context.User.Update(user);
+                    _context.SaveChanges();
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+
         [HttpPost("detail-user")]
         [SwaggerResponse(statusCode: 200, type: typeof(UserDTO), description: "Detail User Response")]
         public async Task<IActionResult> DetailUser(UuidRequest request)
