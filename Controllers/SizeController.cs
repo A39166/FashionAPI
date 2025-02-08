@@ -63,10 +63,22 @@ namespace FashionAPI.Controllers
                         Status = 1,
                     };
                     _context.Size.Add(size);
+                    var lstproduct = _context.Product.Where(x => x.Status == 1).ToList();
+                    foreach(var product in lstproduct)
+                    {
+                        var variant = new Databases.FashionDB.ProductVariant()
+                        {
+                            Uuid = Guid.NewGuid().ToString(),
+                            ProductUuid = product.Uuid,
+                            SizeUuid = size.Uuid,
+                            Stock = 0,
+                            Status = 1
+                        };
+                        _context.ProductVariant.Add(variant);
+                    }
                     _context.SaveChanges();
                 }
                 else
-                //cập nhập dữ liệu
                 {
                     var size = _context.Size.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
                     if (size != null)
@@ -198,6 +210,7 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+
         [HttpPost("update-size-status")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateSizeStatus Response")]
         public async Task<IActionResult> UpdateCastStatus(UuidRequest request)
@@ -218,7 +231,16 @@ namespace FashionAPI.Controllers
                 {
                     if (size.Status == 1)
                     {
-                        size.Status = 0;
+                        var variant = _context.ProductVariant.Where(x => x.SizeUuid == size.Uuid && x.Stock != 0).FirstOrDefault();
+                        if (variant != null)
+                        {
+                            size.Status = 0;
+                        }
+                        else
+                        {
+                            throw new ErrorException(ErrorCode.CANT_LOCKED_SIZE);
+                        }
+                        
                     }
                     else
                     {

@@ -72,5 +72,8 @@ namespace FashionAPI.Enums
 
         [Description("Tài khoản này không có quyền đăng nhập Admin!")]
         NO_PERMISSION_ACTION = 34,
+
+        [Description("Không thể khóa size do còn sản phẩm tồn kho!")]
+        CANT_LOCKED_SIZE = 35,
     }
 }
