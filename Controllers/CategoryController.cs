@@ -243,11 +243,6 @@ namespace FashionAPI.Controllers
         {
             var response = new BaseResponseMessageItem<ClientCategoryDTO>();
 
-            var validToken = validateToken(_context);
-            if (validToken is null)
-            {
-                return Unauthorized();
-            }
             try
             {
                 var cat = _context.Category.Where(x => x.Status == 1)
