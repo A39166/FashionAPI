@@ -10,6 +10,7 @@ using FashionAPI.Models.DataInfo;
 using FashionAPI.Extensions;
 using FashionAPI.Configuaration;
 using System.Drawing;
+using ESDManagerApi.Models.Request;
 
 namespace FashionAPI.Controllers
 {
@@ -236,6 +237,47 @@ namespace FashionAPI.Controllers
             }
         }
 
-        
+        [HttpPost("get-category-client")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ClientCategoryDTO>), description: "GetclientCategory Response")]
+        public async Task<IActionResult> GetclientCategory()
+        {
+            var response = new BaseResponseMessageItem<ClientCategoryDTO>();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var cat = _context.Category.Where(x => x.Status == 1)
+                                                 .ToList();
+                if (cat != null)
+                {
+                    response.Data = cat.Select(p => new ClientCategoryDTO
+                    {
+                        Uuid = p.Uuid,
+                        CategoryName = p.Name,
+                        Path = p.Path,
+                        Status = p.Status
+                    }).ToList();
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+
+
     }
 }
