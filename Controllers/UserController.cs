@@ -219,7 +219,7 @@ namespace FashionAPI.Controllers
 
         [HttpPost("detail-user")]
         [SwaggerResponse(statusCode: 200, type: typeof(UserDTO), description: "Detail User Response")]
-        public async Task<IActionResult> DetailUser(UuidRequest request)
+        public async Task<IActionResult> DetailUser()
         {
             var response = new BaseResponseMessage<UserDTO>();
             var validToken = validateToken(_context);
@@ -229,7 +229,7 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var user = _context.User.Where(x => x.Uuid == request.Uuid).SingleOrDefault(); ;
+                var user = _context.User.Where(x => x.Uuid == validToken.UserUuid).SingleOrDefault(); ;
                 if (user == null)
                 {
                     throw new ErrorException(ErrorCode.USER_NOTFOUND);

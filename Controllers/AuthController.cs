@@ -9,7 +9,7 @@ using FashionAPI.Models.DataInfo;
 using FashionAPI.Models.Request;
 using FashionAPI.Controllers;
 
-namespace CinemaAPI.Controllers
+namespace FashionAPI.Controllers
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
