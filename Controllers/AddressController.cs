@@ -218,6 +218,53 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+        /*[HttpPost("update-address-status")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateAddressStatus Response")]
+        public async Task<IActionResult> UpdateAddressStatus(UpdateStatusRequest request)
+        {
+            var response = new BaseResponse();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var address = _context.UserAddress.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+
+                if (address != null)
+                {
+                    if (address.Status == 1)
+                    {
+                        address.Status = 0;
+                    }
+                    else
+                    {
+                        address.Status = 1;
+                    }
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    response.error.SetErrorCode(ErrorCode.NOT_FOUND);
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }*/
 
     }
     
