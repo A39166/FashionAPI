@@ -120,6 +120,7 @@ namespace FashionAPI.Controllers
                         Fullname = p.Fullname,
                         PhoneNumber = p.PhoneNumber,
                         Address = p.Address,
+                        IsDefault = p.IsDefault,
                         Status = p.Status,
                     }).ToList();
                 }
