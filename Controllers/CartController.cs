@@ -28,10 +28,10 @@ namespace FashionAPI.Controllers
             _logger = logger;
         }
         [HttpPost("add-to-cart")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "AddToCart Response")]
-        public async Task<IActionResult> AddToCart(BaseKeywordRequest request)
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "AddToCart Response")]
+        public async Task<IActionResult> AddToCart(List<AddToCartRequest> requests)
         {
-            var response = new BaseResponseMessageItem<ShortCategoryDTO>();
+            var response = new BaseResponse();
 
             var validToken = validateToken(_context);
             if (validToken is null)
@@ -40,19 +40,59 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var color = _context.Color.Where(x => string.IsNullOrEmpty(request.Keyword)
-                                                        || EF.Functions.Like(x.ColorName + " ", $"%{request.Keyword}%"))
-                                                 .Where(x => x.Status == 1)
-                                                 .ToList();
-                if (color != null)
+                var existcart = _context.Cart.Where(x => x.UserUuid == validToken.UserUuid).FirstOrDefault();
+                if (existcart == null)
                 {
-                    response.Data = color.Select(p => new ShortCategoryDTO
+                    var cart = new Cart()
                     {
-                        Uuid = p.Uuid,
-                        Name = p.ColorName,
-                        Status = p.Status
-                    }).ToList();
+                        Uuid = Guid.NewGuid().ToString(),
+                        UserUuid = validToken.UserUuid,
+                        TimeCreated = DateTime.Now,
+                        Status = 1
+                    };
+                    foreach(var request in requests)
+                    {
+                        var item = new CartItem()
+                        {
+                            Uuid = Guid.NewGuid().ToString(),
+                            CartUuid = cart.Uuid,
+                            ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == request.ProductUuid && x.SizeUuid == request.SizeUuid)
+                                                                        .Select(v => v.Uuid).FirstOrDefault(),
+                            Quantity = request.quantity,
+                            Status = 1,
+                        };
+                        _context.CartItem.Add(item);
+                    }
                 }
+                else
+                {
+                    var cartitem = _context.CartItem.Include(p => p.ProductVariantUu).ToList();
+                    foreach (var request in requests)
+                    {
+                        var existitem = cartitem.Where(x => x.ProductVariantUu.ProductUuid == request.ProductUuid
+                                                 && x.ProductVariantUu.SizeUuid == request.SizeUuid
+                                                 && x.CartUuid == existcart.Uuid).FirstOrDefault();
+                        if (existitem != null)
+                        {
+                            existitem.Quantity = request.quantity;
+                            _context.CartItem.Update(existitem);
+                        }
+                        else
+                        {
+                            var item = new CartItem()
+                            {
+                                Uuid = Guid.NewGuid().ToString(),
+                                CartUuid = existcart.Uuid,
+                                ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == request.ProductUuid && x.SizeUuid == request.SizeUuid)
+                                                                        .Select(v => v.Uuid).FirstOrDefault(),
+                                Quantity = request.quantity,
+                                Status = 1,
+                            };
+                            _context.CartItem.Add(item);
+                        }
+                    }
+                }
+                _context.SaveChanges();
                 return Ok(response);
             }
             catch (ErrorException ex)

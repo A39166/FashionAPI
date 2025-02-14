@@ -95,11 +95,11 @@ namespace FashionAPI.Controllers
             }
         }
 
-        [HttpPost("page-list-address")]
-        [SwaggerResponse(statusCode: 200, type: typeof(List<PageListAddressDTO>), description: "GetPageListAddress Response")]
-        public async Task<IActionResult> GetPageListAddress(DpsPagingParamBase request)
+        [HttpPost("list-address")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<PageListAddressDTO>), description: "GetListAddress Response")]
+        public async Task<IActionResult> GetListAddress()
         {
-            var response = new BaseResponseMessagePage<PageListAddressDTO>();
+            var response = new BaseResponseMessageItem<PageListAddressDTO>();
 
             var validToken = validateToken(_context);
             if (validToken is null)
@@ -109,33 +109,16 @@ namespace FashionAPI.Controllers
             try
             {
                 var lstAddress = _context.UserAddress.Where(x => x.UserUuid == validToken.UserUuid && x.Status == 1).ToList();
-                var totalcount = lstAddress.Count();
-
-                if (lstAddress != null && lstAddress.Count > 0)
+                if (lstAddress != null)
                 {
-                    var result = lstAddress.OrderByDescending(x => x.Id).TakePage(request.Page, request.PageSize);
-                    if (result != null && result.Count > 0)
+                    response.Data = lstAddress.Select(p => new PageListAddressDTO
                     {
-                        response.Data.Items = new List<PageListAddressDTO>();
-                    }
-                    foreach (var address in result)
-                    {
-                        var convertItemDTO = new PageListAddressDTO()
-                        {
-                            Uuid = address.Uuid,
-                            Fullname = address.Fullname,
-                            PhoneNumber = address.PhoneNumber,
-                            Address = address.Address,
-                            Status = address.Status,
-                        };
-                        response.Data.Items.Add(convertItemDTO);
-                    }
-                    // trả về thông tin page
-                    response.Data.Pagination = new Paginations()
-                    {
-                        TotalPage = result.TotalPages,
-                        TotalCount = result.TotalCount,
-                    };
+                        Uuid = p.Uuid,
+                        Fullname = p.Fullname,
+                        PhoneNumber = p.PhoneNumber,
+                        Address = p.Address,
+                        Status = p.Status,
+                    }).ToList();
                 }
 
                 return Ok(response);
@@ -184,8 +167,8 @@ namespace FashionAPI.Controllers
                         TP = address.MatpNavigation != null ? new InfoCatalogDTO
                         {
                             Uuid = address.MatpNavigation.Matp,
-                            Name = address.MatpNavigation.Name 
-                            
+                            Name = address.MatpNavigation.Name
+
                         } : null,
                         QH = address.MaqhNavigation != null ? new InfoCatalogDTO
                         {
@@ -218,9 +201,9 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        /*[HttpPost("update-address-status")]
+        [HttpPost("update-address-status")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateAddressStatus Response")]
-        public async Task<IActionResult> UpdateAddressStatus(UpdateStatusRequest request)
+        public async Task<IActionResult> UpdateAddressStatus(UuidRequest request)
         {
             var response = new BaseResponse();
 
@@ -236,14 +219,7 @@ namespace FashionAPI.Controllers
 
                 if (address != null)
                 {
-                    if (address.Status == 1)
-                    {
-                        address.Status = 0;
-                    }
-                    else
-                    {
-                        address.Status = 1;
-                    }
+                    address.Status = 0;
                     _context.SaveChanges();
                 }
                 else
@@ -264,8 +240,9 @@ namespace FashionAPI.Controllers
 
                 return BadRequest(response);
             }
-        }*/
+        }
 
     }
-    
+
 }
+
