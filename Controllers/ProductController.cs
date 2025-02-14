@@ -65,7 +65,7 @@ namespace FashionAPI.Controllers
                     {
                         foreach (var variant in request.Variants)
                         {
-                            var productVariant = new Databases.FashionDB.ProductVariant()
+                            var productVariant = new ProductVariant()
                             {
                                 Uuid = Guid.NewGuid().ToString(),
                                 ProductUuid = product.Uuid,

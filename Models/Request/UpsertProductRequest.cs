@@ -13,11 +13,11 @@ namespace FashionAPI.Models.Request
         public string? ShortDescription { get; set; }
         public string? Description { get; set; }
         public double Price { get; set; }
-        public List<ProductVariant> Variants { get; set; }
+        public List<ProVariant> Variants { get; set; }
         public List<string>? ImagesPath { get; set; }
 
     }
-    public class ProductVariant
+    public class ProVariant
     {
         public string SizeUuid { get; set; }
         public int Stock { get; set; }
