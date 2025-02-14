@@ -11,6 +11,7 @@ using FashionAPI.Configuaration;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System;
+using Microsoft.AspNetCore.Server.IISIntegration;
 
 namespace FashionAPI.Controllers
 {
@@ -44,6 +45,7 @@ namespace FashionAPI.Controllers
             {
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
+                    var hasDefaultAddress = _context.UserAddress.Any(x => x.UserUuid == validToken.UserUuid && x.IsDefault);
                     var address = new UserAddress()
                     {
                         Uuid = Guid.NewGuid().ToString(),
@@ -54,6 +56,7 @@ namespace FashionAPI.Controllers
                         Maqh = string.IsNullOrEmpty(request.Maqh) ? null : request.Maqh,
                         Matp = string.IsNullOrEmpty(request.Matp) ? null : request.Matp,
                         Xaid = string.IsNullOrEmpty(request.Xaid) ? null : request.Xaid,
+                        IsDefault = !hasDefaultAddress,
                         TimeCreated = DateTime.Now,
                         Status = 1,
                     };
@@ -220,6 +223,47 @@ namespace FashionAPI.Controllers
                 if (address != null)
                 {
                     address.Status = 0;
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    response.error.SetErrorCode(ErrorCode.NOT_FOUND);
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+        [HttpPost("set-address-default")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "SetAddressDefault Response")]
+        public async Task<IActionResult> SetAddressDefault(UuidRequest request)
+        {
+            var response = new BaseResponse();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var address = _context.UserAddress.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                var exist = _context.UserAddress.Where(x => x.IsDefault == true).FirstOrDefault();
+                if (address != null)
+                {
+                    exist.IsDefault = false;
+                    address.IsDefault = true;
                     _context.SaveChanges();
                 }
                 else

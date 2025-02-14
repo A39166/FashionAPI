@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace FashionAPI.Models.DataInfo
 {
-    public class PageListAddressDTO : DpsPagingParamBase
+    public class PageListAddressDTO
     {
         public string Uuid { get; set; }
         public string Fullname { get; set; } = null!;

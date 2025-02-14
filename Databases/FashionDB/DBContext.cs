@@ -116,7 +116,6 @@ public partial class DBContext : DbContext
                 .HasColumnName("status");
             entity.Property(e => e.Uuid)
                 .HasMaxLength(36)
-                .HasDefaultValueSql("uuid()")
                 .IsFixedLength()
                 .HasColumnName("uuid");
 
@@ -640,6 +639,7 @@ public partial class DBContext : DbContext
             entity.Property(e => e.Fullname)
                 .HasMaxLength(50)
                 .HasColumnName("fullname");
+            entity.Property(e => e.IsDefault).HasColumnName("isDefault");
             entity.Property(e => e.Maqh)
                 .HasMaxLength(5)
                 .HasColumnName("maqh");

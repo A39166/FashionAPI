@@ -30,6 +30,8 @@ public partial class UserAddress
     /// </summary>
     public sbyte Status { get; set; }
 
+    public bool IsDefault { get; set; }
+
     public virtual District MaqhNavigation { get; set; } = null!;
 
     public virtual Province MatpNavigation { get; set; } = null!;
