@@ -23,7 +23,6 @@ namespace FashionAPI.Controllers
     {
         private readonly ILogger<AddressController> _logger;
         private readonly DBContext _context;
-
         public AddressController(DBContext context, ILogger<AddressController> logger)
         {
 

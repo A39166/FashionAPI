@@ -37,10 +37,10 @@ namespace FashionAPI.Controllers
         }
 
         [HttpPost("get-color-category")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetColorCategory Response")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortColorCategoryDTO>), description: "GetColorCategory Response")]
         public async Task<IActionResult> GetColorCategory(CategoryRequest request)
         {
-            var response = new BaseResponseMessageItem<ShortCategoryDTO>();
+            var response = new BaseResponseMessageItem<ShortColorCategoryDTO>();
 
             var validToken = validateToken(_context);
             if (validToken is null)
@@ -53,10 +53,11 @@ namespace FashionAPI.Controllers
                                           .ToList();
                 if (color != null)
                 {
-                    response.Data = color.Select(p => new ShortCategoryDTO
+                    response.Data = color.Select(p => new ShortColorCategoryDTO
                     {
                         Uuid = p.Uuid,
                         Name = p.ColorName,
+                        Code = p.Code,
                         Status = p.Status
                     }).ToList();
                 }

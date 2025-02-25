@@ -262,6 +262,7 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+
         [HttpPost("product-detail")]
         [SwaggerResponse(statusCode: 200, type: typeof(ProductDTO), description: "GetProductDetail Response")]
         public async Task<IActionResult> GetProductDetail(UuidRequest request)

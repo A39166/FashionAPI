@@ -108,7 +108,48 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+        [HttpPost("get-list-cart")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<PageListAddressDTO>), description: "GetListCart Response")]
+        public async Task<IActionResult> GetListCart()
+        {
+            var response = new BaseResponseMessageItem<PageListAddressDTO>();
 
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var lstAddress = _context.UserAddress.Where(x => x.UserUuid == validToken.UserUuid && x.Status == 1).ToList();
+                if (lstAddress != null)
+                {
+                    response.Data = lstAddress.Select(p => new PageListAddressDTO
+                    {
+                        Uuid = p.Uuid,
+                        Fullname = p.Fullname,
+                        PhoneNumber = p.PhoneNumber,
+                        Address = p.Address,
+                        IsDefault = p.IsDefault,
+                        Status = p.Status,
+                    }).ToList();
+                }
+
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
 
     }
     
