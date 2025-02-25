@@ -85,7 +85,19 @@ namespace FashionAPI.Controllers
 
                 if (lstProduct != null && lstProduct.Count > 0)
                 {
-                    var result = lstProduct.OrderByDescending(x => x.Id).TakePage(request.Page, request.PageSize);
+                    var result = lstProduct.TakePage(request.Page, request.PageSize);
+                    if(request.Sorted == 1)
+                    {
+                        result.OrderBy(x => x.Price);
+                    }
+                    else if(request.Sorted == 2)
+                    {
+                        result.OrderByDescending(x => x.Price);
+                    }
+                    else
+                    {
+                        result.OrderByDescending(x => x.Id);
+                    }
                     if (result != null && result.Count > 0)
                     {
                         response.Data.Items = new List<PageListProductClientDTO>();
@@ -105,7 +117,7 @@ namespace FashionAPI.Controllers
                                 Status = p.Status
                             }).FirstOrDefault(),
                             Price = product.Price,
-                            ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == product.Uuid && x.IsDefault == true).Select(x => x.Path).FirstOrDefault(),
+                            ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == product.Uuid && x.IsDefault == true && x.Status == 1).Select(x => x.Path).FirstOrDefault(),
                             Status = product.Status,
                         };
                         response.Data.Items.Add(convertItemDTO);
@@ -178,12 +190,12 @@ namespace FashionAPI.Controllers
                         Description = productdetail.Description,
                         Price = productdetail.Price,
                         Status = productdetail.Status,
-                        Variants = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
+                        Size = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
                         .Select(v => new ShortCategoryDTO
                         {
-                            Uuid = v.Uuid,
+                            Uuid = v.SizeUu.Uuid,
                             Name = v.SizeUu.SizeName,
-                            Status = v.Status,
+                            Status = v.SizeUu.Status,
                         })
                         .ToList(),
                         ImagesPath = productImages
