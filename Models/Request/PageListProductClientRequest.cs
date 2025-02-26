@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace FashionAPI.Models.Request
 {
-    public class PageListProductClientRequest : BaseKeywordPageRequest
+    public class PageListProductClientRequest : DpsPagingParamBase
     {
         public string? CategoryUuid { get; set; }
         public string? ColorUuid { get; set; }

@@ -71,7 +71,6 @@ namespace FashionAPI.Controllers
             try
             {
                 var lstProduct = _context.Product.Include(x => x.ProductVariant)
-                    /*.Where(x => string.IsNullOrEmpty(request.Keyword) || EF.Functions.Like(x.Name + "" + x.Code, $"%{request.Keyword}%")*/
                     .Where(x => string.IsNullOrEmpty(request.CategoryUuid) || x.CatUuid == request.CategoryUuid)
                     .Where(x => string.IsNullOrEmpty(request.ColorUuid) || x.ColorUuid == request.ColorUuid)
                     .Where(x => x.Status == 1)
@@ -80,23 +79,25 @@ namespace FashionAPI.Controllers
 
                 if (lstProduct != null && lstProduct.Count > 0)
                 {
-                    var result = lstProduct.TakePage(request.Page, request.PageSize);
+                    
                     if(request.Sorted == 1)
                     {
-                        result.OrderBy(x => x.Price);
+                        lstProduct = lstProduct.OrderBy(x => x.Price).ToList();
                     }
                     else if(request.Sorted == 2)
                     {
-                        result.OrderByDescending(x => x.Price);
+                        lstProduct = lstProduct.OrderByDescending(x => x.Price).ToList();
                     }
                     else
                     {
-                        result.OrderByDescending(x => x.Id);
+                        lstProduct = lstProduct.OrderByDescending(x => x.Id).ToList();
                     }
+                    var result = lstProduct.TakePage(request.Page, request.PageSize);
                     if (result != null && result.Count > 0)
                     {
                         response.Data.Items = new List<PageListProductClientDTO>();
                     }
+                   
                     foreach (var product in result)
                     {
                         var convertItemDTO = new PageListProductClientDTO()
@@ -180,10 +181,11 @@ namespace FashionAPI.Controllers
                         Price = productdetail.Price,
                         Status = productdetail.Status,
                         Size = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
-                        .Select(v => new ShortCategoryDTO
+                        .Select(v => new ShortSizeCategoryDTO
                         {
                             Uuid = v.SizeUu.Uuid,
                             Name = v.SizeUu.SizeName,
+                            Stock = v.Stock,
                             Status = v.SizeUu.Status,
                         })
                         .ToList(),

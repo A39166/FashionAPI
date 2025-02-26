@@ -11,7 +11,7 @@ namespace FashionAPI.Models.DataInfo
         public string? ShortDescription { get; set; }
         public string? Description { get; set; }
         public double Price { get; set; }
-        public List<ShortCategoryDTO> Size { get; set; }
+        public List<ShortSizeCategoryDTO> Size { get; set; }
         public List<string>? ImagesPath { get; set; }
         public sbyte Status { get; set; }
     }

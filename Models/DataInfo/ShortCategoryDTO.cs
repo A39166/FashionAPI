@@ -9,4 +9,8 @@
     {
         public string Code { get; set; }
     }
+    public class ShortSizeCategoryDTO : ShortCategoryDTO
+    {
+        public int Stock { get; set; }
+    }
 }
