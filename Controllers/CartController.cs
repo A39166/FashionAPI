@@ -134,6 +134,7 @@ namespace FashionAPI.Controllers
             {
                 var cart = _context.CartItem.Include(c => c.CartUu)
                                             .Include(p => p.ProductVariantUu).ThenInclude(p => p.ProductUu).ThenInclude(i => i.ProductImage)
+                                            .Include(p => p.ProductVariantUu).ThenInclude(p => p.ProductUu).ThenInclude(c => c.ColorUu)
                                             .Include(p => p.ProductVariantUu).ThenInclude(p => p.SizeUu)
                                             .Where(x => x.CartUu.UserUuid == validToken.UserUuid).ToList();
                 response.Data = cart.Select(c => new ProductForCartDTO
@@ -182,10 +183,10 @@ namespace FashionAPI.Controllers
         }
 
         [HttpPost("get-quantity-cart")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessage<int>), description: "GetQuantityCart Response")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessage<CartQuantityResponse>), description: "GetQuantityCart Response")]
         public async Task<IActionResult> GetQuantityCart()
         {
-            var response = new BaseResponseMessage<int>();
+            var response = new BaseResponseMessage<CartQuantityResponse>();
 
             var validToken = validateToken(_context);
             if (validToken is null)
@@ -198,7 +199,7 @@ namespace FashionAPI.Controllers
                     .Include(c => c.CartUu)
                     .Where(x => x.CartUu.UserUuid == validToken.UserUuid)
                     .Count();
-                response.Data = quantity;
+                response.Data = new CartQuantityResponse { Quantity = quantity };
                 return Ok(response);
             }
             catch (ErrorException ex)
