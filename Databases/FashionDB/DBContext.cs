@@ -46,14 +46,16 @@ public partial class DBContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
-            .UseCollation("utf8mb4_unicode_520_ci")
+            .UseCollation("utf8mb4_general_ci")
             .HasCharSet("utf8mb4");
 
         modelBuilder.Entity<Cart>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("cart");
+            entity
+                .ToTable("cart")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.UserUuid, "fk_user_uuid_cart");
 
@@ -89,7 +91,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("cart_item");
+            entity
+                .ToTable("cart_item")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.CartUuid, "kf_cart_uuid_pc");
 
@@ -116,6 +120,7 @@ public partial class DBContext : DbContext
                 .HasColumnName("status");
             entity.Property(e => e.Uuid)
                 .HasMaxLength(36)
+                .HasDefaultValueSql("uuid()")
                 .IsFixedLength()
                 .HasColumnName("uuid");
 
@@ -134,7 +139,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("category");
+            entity
+                .ToTable("category")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
 
@@ -165,7 +172,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("color");
+            entity
+                .ToTable("color")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
 
@@ -230,7 +239,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("order");
+            entity
+                .ToTable("order")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.AddressUuid, "fk_address_uuid_order");
 
@@ -246,6 +257,7 @@ public partial class DBContext : DbContext
             entity.Property(e => e.Code)
                 .HasMaxLength(50)
                 .HasColumnName("code");
+            entity.Property(e => e.Note).HasColumnName("note");
             entity.Property(e => e.State)
                 .HasComment("0-Xác nhận đơn hàng, 1-Đang giao hàng,2-Giao thành công")
                 .HasColumnType("tinyint(4)")
@@ -278,7 +290,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("order_item");
+            entity
+                .ToTable("order_item")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.OrderUuid, "fk_order_uuid_oi");
 
@@ -327,7 +341,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("product");
+            entity
+                .ToTable("product")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.CatUuid, "fk_cat_uuid_product");
 
@@ -385,7 +401,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("product_image");
+            entity
+                .ToTable("product_image")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.ProductUuid, "fk_product_uuid_pi");
 
@@ -421,7 +439,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("product_variant");
+            entity
+                .ToTable("product_variant")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.ProductUuid, "fk_product_uuid_pv");
 
@@ -496,7 +516,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("sessions");
+            entity
+                .ToTable("sessions")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.UserUuid, "fk_user_uuid_ss");
 
@@ -535,7 +557,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("size");
+            entity
+                .ToTable("size")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
 
@@ -566,7 +590,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("user");
+            entity
+                .ToTable("user")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.Uuid, "unq_uuid").IsUnique();
 
@@ -618,7 +644,9 @@ public partial class DBContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("user_address");
+            entity
+                .ToTable("user_address")
+                .UseCollation("utf8mb4_unicode_520_ci");
 
             entity.HasIndex(e => e.Maqh, "fk_maqh_address");
 

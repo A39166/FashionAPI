@@ -45,6 +45,7 @@ namespace FashionAPI.Controllers
                     Uuid = Guid.NewGuid().ToString(),
                     AddressUuid = request.AddressUuid,
                     TotalPrice = request.TotalPrice,
+                    Note = request.Note,
                     State = 0,
                     TimeCreated = DateTime.Now,
                     Status = 1

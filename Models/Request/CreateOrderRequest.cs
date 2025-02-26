@@ -5,6 +5,7 @@
         public List<ProductForOrder> Product {  get; set; }
         public string AddressUuid { get; set; }
         public double TotalPrice { get; set; }
+        public string Note { get; set; }
     }
 
     public class ProductForOrder
