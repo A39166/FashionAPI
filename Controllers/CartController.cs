@@ -64,45 +64,29 @@ namespace FashionAPI.Controllers
                 }
                 else
                 {
-                    var item = new CartItem()
+                    var variant = _context.CartItem.Include(x => x.ProductVariantUu)
+                                                    .Where(x => x.CartUuid == existcart.Uuid)
+                                                    .Where(x => x.ProductVariantUu.ProductUuid == requests.ProductUuid && x.ProductVariantUu.SizeUuid == requests.SizeUuid)
+                                                    .FirstOrDefault();
+                    if (variant != null)
                     {
-                        Uuid = Guid.NewGuid().ToString(),
-                        CartUuid = existcart.Uuid,
-                        ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == requests.ProductUuid && x.SizeUuid == requests.SizeUuid)
-                                                                    .Select(v => v.Uuid).FirstOrDefault(),
-                        Quantity = requests.quantity,
-                        Status = 1,
-                    };
-                    _context.CartItem.Add(item);
-                }
-                /*else
-                {
-                    var cartitem = _context.CartItem.Include(p => p.ProductVariantUu).ToList();
-                    foreach (var request in requests)
-                    {
-                        var existitem = cartitem.Where(x => x.ProductVariantUu.ProductUuid == request.ProductUuid
-                                                 && x.ProductVariantUu.SizeUuid == request.SizeUuid
-                                                 && x.CartUuid == existcart.Uuid).FirstOrDefault();
-                        if (existitem != null)
-                        {
-                            existitem.Quantity = request.quantity;
-                            _context.CartItem.Update(existitem);
-                        }
-                        else
-                        {
-                            var item = new CartItem()
-                            {
-                                Uuid = Guid.NewGuid().ToString(),
-                                CartUuid = existcart.Uuid,
-                                ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == request.ProductUuid && x.SizeUuid == request.SizeUuid)
-                                                                        .Select(v => v.Uuid).FirstOrDefault(),
-                                Quantity = request.quantity,
-                                Status = 1,
-                            };
-                            _context.CartItem.Add(item);
-                        }
+                        variant.Quantity = requests.quantity + variant.Quantity;
                     }
-                }*/
+                    else
+                    {
+                        var item = new CartItem()
+                        {
+                            Uuid = Guid.NewGuid().ToString(),
+                            CartUuid = existcart.Uuid,
+                            ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == requests.ProductUuid && x.SizeUuid == requests.SizeUuid)
+                                                                    .Select(v => v.Uuid).FirstOrDefault(),
+                            Quantity = requests.quantity,
+                            Status = 1,
+                        };
+                        _context.CartItem.Add(item);
+                    }
+                    
+                }
                 _context.SaveChanges();
                 return Ok(response);
             }
