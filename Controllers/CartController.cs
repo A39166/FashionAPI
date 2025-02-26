@@ -50,6 +50,7 @@ namespace FashionAPI.Controllers
                         TimeCreated = DateTime.Now,
                         Status = 1
                     };
+                    _context.Cart.Add(cart);
                     var item = new CartItem()
                     {
                         Uuid = Guid.NewGuid().ToString(),
