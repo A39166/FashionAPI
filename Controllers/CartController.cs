@@ -216,6 +216,49 @@ namespace FashionAPI.Controllers
             }
         }
 
+        [HttpPost("remove-item-from-cart")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "RemoveItemFromCart Response")]
+        public async Task<IActionResult> RemoveItemFromCart(UuidRequest request)
+        {
+            var response = new BaseResponse();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var item = _context.CartItem.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+
+                if (item != null)
+                {
+
+                    _context.CartItem.Remove(item);
+                    _context.SaveChanges();
+
+                }
+                else
+                {
+                    response.error.SetErrorCode(ErrorCode.NOT_FOUND);
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+
     }
     
 }
