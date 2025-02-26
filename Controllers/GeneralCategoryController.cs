@@ -82,12 +82,6 @@ namespace FashionAPI.Controllers
         public async Task<IActionResult> GetColorCategoryClient()
         {
             var response = new BaseResponseMessageItem<ShortColorCategoryDTO>();
-
-            var validToken = validateToken(_context);
-            if (validToken is null)
-            {
-                return Unauthorized();
-            }
             try
             {
                 var color = _context.Color.Where(x => x.Status == 1)
