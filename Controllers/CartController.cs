@@ -183,7 +183,7 @@ namespace FashionAPI.Controllers
                 int quantity = _context.CartItem
                     .Include(c => c.CartUu)
                     .Where(x => x.CartUu.UserUuid == validToken.UserUuid)
-                    .Sum(x => x.Quantity);
+                    .Count();
                 response.Data = quantity;
                 return Ok(response);
             }
