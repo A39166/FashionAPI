@@ -68,11 +68,6 @@ namespace FashionAPI.Controllers
         {
             var response = new BaseResponseMessagePage<PageListProductClientDTO>();
 
-            var validToken = validateToken(_context);
-            if (validToken is null)
-            {
-                return Unauthorized();
-            }
             try
             {
                 var lstProduct = _context.Product.Include(x => x.ProductVariant)
@@ -151,12 +146,6 @@ namespace FashionAPI.Controllers
         public async Task<IActionResult> GetProductDetail(UuidRequest request)
         {
             var response = new BaseResponseMessage<ProductDetailClientDTO>();
-
-            var validToken = validateToken(_context);
-            if (validToken is null)
-            {
-                return Unauthorized();
-            }
 
             try
             {
