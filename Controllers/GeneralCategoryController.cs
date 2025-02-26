@@ -76,6 +76,48 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+
+        [HttpPost("get-color-category-client")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortColorCategoryDTO>), description: "GetColorCategoryClient Response")]
+        public async Task<IActionResult> GetColorCategoryClient()
+        {
+            var response = new BaseResponseMessageItem<ShortColorCategoryDTO>();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var color = _context.Color.Where(x => x.Status == 1)
+                                          .ToList();
+                if (color != null)
+                {
+                    response.Data = color.Select(p => new ShortColorCategoryDTO
+                    {
+                        Uuid = p.Uuid,
+                        Name = p.ColorName,
+                        Code = p.Code,
+                        Status = p.Status
+                    }).ToList();
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+
         [HttpPost("get-size-category")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ShortCategoryDTO>), description: "GetSizeCategory Response")]
         public async Task<IActionResult> GetSizeCategory(CategoryRequest request)
