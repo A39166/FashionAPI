@@ -54,7 +54,20 @@ namespace FashionAPI.Controllers
                     var item = new CartItem()
                     {
                         Uuid = Guid.NewGuid().ToString(),
-                        CartUuid = cart.Uuid,
+                        CartUuid = existcart.Uuid,
+                        ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == requests.ProductUuid && x.SizeUuid == requests.SizeUuid)
+                                                                    .Select(v => v.Uuid).FirstOrDefault(),
+                        Quantity = requests.quantity,
+                        Status = 1,
+                    };
+                    _context.CartItem.Add(item);
+                }
+                else
+                {
+                    var item = new CartItem()
+                    {
+                        Uuid = Guid.NewGuid().ToString(),
+                        CartUuid = existcart.Uuid,
                         ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == requests.ProductUuid && x.SizeUuid == requests.SizeUuid)
                                                                     .Select(v => v.Uuid).FirstOrDefault(),
                         Quantity = requests.quantity,
