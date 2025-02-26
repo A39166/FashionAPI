@@ -143,7 +143,7 @@ namespace FashionAPI.Controllers
 
         [HttpPost("product-detail-client")]
         [SwaggerResponse(statusCode: 200, type: typeof(ProductDetailClientDTO), description: "GetProductDetailClient Response")]
-        public async Task<IActionResult> GetProductDetail(UuidRequest request)
+        public async Task<IActionResult> GetProductDetailClient(UuidRequest request)
         {
             var response = new BaseResponseMessage<ProductDetailClientDTO>();
 
