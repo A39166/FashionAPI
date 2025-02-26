@@ -29,7 +29,7 @@ namespace FashionAPI.Controllers
         }
         [HttpPost("add-to-cart")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "AddToCart Response")]
-        public async Task<IActionResult> AddToCart(List<AddToCartRequest> requests)
+        public async Task<IActionResult> AddToCart(AddToCartRequest requests)
         {
             var response = new BaseResponse();
 
@@ -50,21 +50,18 @@ namespace FashionAPI.Controllers
                         TimeCreated = DateTime.Now,
                         Status = 1
                     };
-                    foreach(var request in requests)
+                    var item = new CartItem()
                     {
-                        var item = new CartItem()
-                        {
-                            Uuid = Guid.NewGuid().ToString(),
-                            CartUuid = cart.Uuid,
-                            ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == request.ProductUuid && x.SizeUuid == request.SizeUuid)
-                                                                        .Select(v => v.Uuid).FirstOrDefault(),
-                            Quantity = request.quantity,
-                            Status = 1,
-                        };
-                        _context.CartItem.Add(item);
-                    }
+                        Uuid = Guid.NewGuid().ToString(),
+                        CartUuid = cart.Uuid,
+                        ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == requests.ProductUuid && x.SizeUuid == requests.SizeUuid)
+                                                                    .Select(v => v.Uuid).FirstOrDefault(),
+                        Quantity = requests.quantity,
+                        Status = 1,
+                    };
+                    _context.CartItem.Add(item);
                 }
-                else
+                /*else
                 {
                     var cartitem = _context.CartItem.Include(p => p.ProductVariantUu).ToList();
                     foreach (var request in requests)
@@ -91,7 +88,7 @@ namespace FashionAPI.Controllers
                             _context.CartItem.Add(item);
                         }
                     }
-                }
+                }*/
                 _context.SaveChanges();
                 return Ok(response);
             }
@@ -109,10 +106,10 @@ namespace FashionAPI.Controllers
             }
         }
         [HttpPost("get-list-cart")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<PageListAddressDTO>), description: "GetListCart Response")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<ProductForCartDTO>), description: "GetListCart Response")]
         public async Task<IActionResult> GetListCart()
         {
-            var response = new BaseResponseMessageItem<PageListAddressDTO>();
+            var response = new BaseResponseMessageItem<ProductForCartDTO>();
 
             var validToken = validateToken(_context);
             if (validToken is null)
@@ -121,19 +118,38 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var lstAddress = _context.UserAddress.Where(x => x.UserUuid == validToken.UserUuid && x.Status == 1).ToList();
-                if (lstAddress != null)
+                var cart = _context.CartItem.Include(c => c.CartUu)
+                                            .Include(p => p.ProductVariantUu).ThenInclude(p => p.ProductUu).ThenInclude(i => i.ProductImage)
+                                            .Include(p => p.ProductVariantUu).ThenInclude(p => p.SizeUu)
+                                            .Where(x => x.CartUu.UserUuid == validToken.UserUuid).ToList();
+                response.Data = cart.Select(c => new ProductForCartDTO
                 {
-                    response.Data = lstAddress.Select(p => new PageListAddressDTO
+                    Uuid = c.Uuid,
+                    Quantity = c.Quantity,
+                    Product = new ShortProductDTO
                     {
-                        Uuid = p.Uuid,
-                        Fullname = p.Fullname,
-                        PhoneNumber = p.PhoneNumber,
-                        Address = p.Address,
-                        IsDefault = p.IsDefault,
-                        Status = p.Status,
-                    }).ToList();
-                }
+                        Uuid = c.ProductVariantUu.ProductUu.Uuid,
+                        ProductName = c.ProductVariantUu.ProductUu.ProductName,
+                        Code = c.ProductVariantUu.ProductUu.Code,
+                        Price = c.ProductVariantUu.ProductUu.Price,
+                        ImagesPath = c.ProductVariantUu.ProductUu.ProductImage.Where(x => x.IsDefault == true && x.Status == 1).Select(x => x.Path).FirstOrDefault(),
+                    },
+                    Color = new ShortColorCategoryDTO
+                    {
+                        Uuid = c.ProductVariantUu.ProductUu.ColorUu.Uuid,
+                        Name = c.ProductVariantUu.ProductUu.ColorUu.ColorName,
+                        Code = c.ProductVariantUu.ProductUu.ColorUu.Code,
+                        Status = c.ProductVariantUu.ProductUu.ColorUu.Status,
+                    },
+                    Size = new ShortCategoryDTO
+                    {
+                        Uuid = c.ProductVariantUu.SizeUu.Uuid,
+                        Name = c.ProductVariantUu.SizeUu.SizeName,
+                        Status = c.ProductVariantUu.SizeUu.Status,
+                    },
+
+
+                }).ToList();
 
                 return Ok(response);
             }
@@ -141,6 +157,40 @@ namespace FashionAPI.Controllers
             {
                 response.error.SetErrorCode(ex.Code);
                 return BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+
+        [HttpPost("get-quantity-cart")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessage<int>), description: "GetQuantityCart Response")]
+        public async Task<IActionResult> GetQuantityCart()
+        {
+            var response = new BaseResponseMessage<int>();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                int quantity = _context.CartItem
+                    .Include(c => c.CartUu)
+                    .Where(x => x.CartUu.UserUuid == validToken.UserUuid)
+                    .Sum(x => x.Quantity);
+                response.Data = quantity;
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
             }
             catch (Exception ex)
             {

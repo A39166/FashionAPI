@@ -16,4 +16,13 @@ namespace FashionAPI.Models.DataInfo
         public DateTime TimeCreated { get; set; }
         public sbyte Status { get; set; }
     }
+    
+
+    public class ShortProductDTO : BaseDTO
+    {
+        public string ProductName{ get; set; }
+        public string Code { set; get; }
+        public double Price { get; set; }
+        public string? ImagesPath { get; set; }
+    }
 }

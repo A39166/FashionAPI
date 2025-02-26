@@ -74,7 +74,7 @@ namespace FashionAPI.Controllers
 
         [HttpPost("get-list-district")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<District>), description: "GetListDistrict Response")]
-        public async Task<IActionResult> GetListDistrict(BaseKeywordRequest request)
+        public async Task<IActionResult> GetListDistrict(FindProvinceRequest request)
         {
             var response = new BaseResponseMessageItem<District>();
 
@@ -86,7 +86,8 @@ namespace FashionAPI.Controllers
             try
             {
                 var province = _context.District.Where(x => string.IsNullOrEmpty(request.Keyword)
-                                                  || EF.Functions.Like(x.Name + "", $"%{request.Keyword}%")).ToList();
+                                                  || EF.Functions.Like(x.Name + "", $"%{request.Keyword}%"))
+                                                .Where(x => x.Matp == request.IdParent).ToList();
                 if (province != null)
                 {
                     response.Data = province.Select(p => new District
@@ -116,7 +117,7 @@ namespace FashionAPI.Controllers
 
         [HttpPost("get-list-ward")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<Ward>), description: "GetListWard Response")]
-        public async Task<IActionResult> GetListWard(BaseKeywordRequest request)
+        public async Task<IActionResult> GetListWard(FindProvinceRequest request)
         {
             var response = new BaseResponseMessageItem<Ward>();
 
@@ -128,7 +129,8 @@ namespace FashionAPI.Controllers
             try
             {
                 var province = _context.Ward.Where(x => string.IsNullOrEmpty(request.Keyword)
-                                                  || EF.Functions.Like(x.Name + "", $"%{request.Keyword}%")).ToList();
+                                                  || EF.Functions.Like(x.Name + "", $"%{request.Keyword}%"))
+                                            .Where(x => x.Maqh == request.IdParent).ToList();
                 if (province != null)
                 {
                     response.Data = province.Select(p => new Ward
