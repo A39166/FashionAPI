@@ -319,7 +319,7 @@ namespace FashionAPI.Controllers
 
             try
             {
-                var order = _context.Order.Include(x => x.OrderItem)
+                var order = _context.Order.Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu)
                     .Where(x => x.Uuid == request.Uuid).SingleOrDefault();
                 
                 if (order != null)
