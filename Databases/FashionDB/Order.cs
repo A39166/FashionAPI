@@ -16,7 +16,7 @@ public partial class Order
     public double TotalPrice { get; set; }
 
     /// <summary>
-    /// 0-Xác nhận đơn hàng, 1-Đang giao hàng,2-Giao thành công
+    /// 0-Chờ xác nhận, 1-Đang giao hàng,2-Giao thành công,3-Hủy đơn hàng
     /// </summary>
     public sbyte State { get; set; }
 
@@ -25,6 +25,8 @@ public partial class Order
     public sbyte Status { get; set; }
 
     public string? Note { get; set; }
+
+    public DateTime? TimeUpdate { get; set; }
 
     public virtual UserAddress AddressUu { get; set; } = null!;
 

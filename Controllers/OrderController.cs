@@ -178,6 +178,7 @@ namespace FashionAPI.Controllers
                             State = order.State,
                             Note = order.Note,
                             TimeCreated = order.TimeCreated,
+                            TimeUpdate = order.TimeUpdate,
                             Status = order.Status,
                         };
                         response.Data.Items.Add(convertItemDTO);
@@ -267,10 +268,12 @@ namespace FashionAPI.Controllers
                     if(order.State == 0)
                     {
                         order.State = 1;
+                        order.TimeUpdate = DateTime.Now;
                     }
                     else if(order.State == 1)
                     {
                         order.State = 2;
+                        order.TimeUpdate = DateTime.Now;
                     }
                     _context.SaveChanges();
                 }

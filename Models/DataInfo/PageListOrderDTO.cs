@@ -16,5 +16,6 @@ public class PageListOrderDTO : BaseDTO
     public sbyte State { get; set; }
     public string Note {  get; set; }
     public DateTime TimeCreated { get; set; }
+    public DateTime? TimeUpdate { get; set; }
     public sbyte Status { get; set; }
 }
