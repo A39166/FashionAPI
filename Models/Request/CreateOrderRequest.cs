@@ -13,7 +13,7 @@
         public string ProductUuid { get; set; }
         public string SizeUuid { get; set; }
         public double Price { get; set; }
-        public int quantity { get; set; }
+        public int Quantity { get; set; }
 
     }
 }

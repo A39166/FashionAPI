@@ -121,6 +121,24 @@ namespace FashionAPI.Controllers
                         Address = p.Address,
                         IsDefault = p.IsDefault,
                         Status = p.Status,
+                        TP = p.MatpNavigation != null ? new InfoCatalogDTO
+                        {
+                            Uuid = p.MatpNavigation.Matp,
+                            Name = p.MatpNavigation.Name
+
+                        } : null,
+                        QH = p.MaqhNavigation != null ? new InfoCatalogDTO
+                        {
+                            Uuid = p.MaqhNavigation.Maqh,
+                            Name = p.MaqhNavigation.Name
+
+                        } : null,
+                        XA = p.Xa != null ? new InfoCatalogDTO
+                        {
+                            Uuid = p.Xa.Xaid,
+                            Name = p.Xa.Name
+
+                        } : null,
                     }).ToList();
                 }
 
@@ -153,7 +171,7 @@ namespace FashionAPI.Controllers
             try
             {
                 var address = _context.UserAddress.Include(t => t.MatpNavigation).Include(t => t.MaqhNavigation).Include(t => t.Xa)
-                    .Where(x => x.Uuid == validToken.UserUuid).SingleOrDefault(); ;
+                    .Where(x => x.Uuid == request.Uuid).FirstOrDefault(); ;
                 if (address == null)
                 {
                     throw new ErrorException(ErrorCode.USER_NOTFOUND);

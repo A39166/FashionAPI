@@ -12,6 +12,11 @@ namespace FashionAPI.Models.DataInfo
         public string Address { get; set; }
         public bool IsDefault { get; set; }
         public sbyte Status { get; set; }
+        public InfoCatalogDTO? TP { get; set; }
 
-}
+        public InfoCatalogDTO? QH { get; set; }
+
+        public InfoCatalogDTO? XA { get; set; }
+
+    }
 }

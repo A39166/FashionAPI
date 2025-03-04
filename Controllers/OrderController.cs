@@ -40,7 +40,7 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var Order = new Order()
+                var order = new Order()
                 {
                     Uuid = Guid.NewGuid().ToString(),
                     AddressUuid = request.AddressUuid,
@@ -50,7 +50,26 @@ namespace FashionAPI.Controllers
                     TimeCreated = DateTime.Now,
                     Status = 1
                 };
-                Order.Code = "ORD" + Order.Id; 
+                order.Code = "ORD" + order.Id;
+                _context.Order.Add(order);
+                foreach(var item in request.Product)
+                {
+                    var orderitem = new OrderItem()
+                    {
+                        Uuid = Guid.NewGuid().ToString(),
+                        OrderUuid = order.Uuid,
+                        ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == item.ProductUuid && x.SizeUuid == item.SizeUuid)
+                                                                    .Select(v => v.Uuid).FirstOrDefault(),
+                        Quantity = item.Quantity,
+                        Price = item.Price,
+                    };
+                    _context.OrderItem.Add(orderitem);
+                    var variant = _context.ProductVariant.Where(x => x.ProductUuid == item.ProductUuid && x.SizeUuid == item.SizeUuid)
+                                                         .FirstOrDefault();
+                    variant.Stock = variant.Stock - item.Quantity;
+                    _context.ProductVariant.Update(variant);
+                }
+                _context.SaveChanges();
                 return Ok(response);
             }
             catch (ErrorException ex)
