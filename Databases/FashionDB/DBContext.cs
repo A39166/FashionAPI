@@ -270,9 +270,7 @@ public partial class DBContext : DbContext
                 .HasDefaultValueSql("current_timestamp()")
                 .HasColumnType("timestamp")
                 .HasColumnName("time_created");
-            entity.Property(e => e.TimeUpdate)
-                .HasColumnType("timestamp")
-                .HasColumnName("time_update");
+            entity.Property(e => e.TimeUpdate).HasColumnName("time_update");
             entity.Property(e => e.TotalPrice)
                 .HasColumnType("double(11,2)")
                 .HasColumnName("total_price");
