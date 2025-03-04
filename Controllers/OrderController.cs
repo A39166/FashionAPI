@@ -133,6 +133,7 @@ namespace FashionAPI.Controllers
                                 Uuid = order.AddressUu.Uuid,
                                 UserUuid = order.AddressUu.UserUuid,
                                 Fullname = order.AddressUu.Fullname,
+                                Address = order.AddressUu.Address,
                                 PhoneNumber = order.AddressUu.PhoneNumber,
                                 TP = order.AddressUu.MatpNavigation != null ? new InfoCatalogDTO
                                 {
@@ -203,6 +204,144 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+
+        [HttpPost("update-order-status")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpdateOrderStatus Response")]
+        public async Task<IActionResult> UpdateOrderStatus(UuidRequest request)
+        {
+            var response = new BaseResponse();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var order = _context.Order.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+
+                if (order != null)
+                {
+                    order.Status = 0;
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    response.error.SetErrorCode(ErrorCode.NOT_FOUND);
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+
+        [HttpPost("change-order-state")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "ChangeOrderState Response")]
+        public async Task<IActionResult> ChangeOrderState(UuidRequest request)
+        {
+            var response = new BaseResponse();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var order = _context.Order.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+
+                if (order != null)
+                {
+                    if(order.State == 0)
+                    {
+                        order.State = 1;
+                    }
+                    else if(order.State == 1)
+                    {
+                        order.State = 2;
+                    }
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    response.error.SetErrorCode(ErrorCode.NOT_FOUND);
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+
+        [HttpPost("cancel-order")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "CancelOrder Response")]
+        public async Task<IActionResult> CancelOrder(UuidRequest request)
+        {
+            var response = new BaseResponse();
+
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var order = _context.Order.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+
+                if (order != null)
+                {
+                    if(order.State != 0)
+                    {
+                        throw new ErrorException(ErrorCode.CANT_CANCEL_ORDER);
+                    }
+                    else
+                    {
+                        order.State = 3;
+                    }
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    response.error.SetErrorCode(ErrorCode.NOT_FOUND);
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
+
 
 
 

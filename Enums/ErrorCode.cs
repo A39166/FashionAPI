@@ -78,5 +78,8 @@ namespace FashionAPI.Enums
 
         [Description("Không tìm thấy địa chỉ!")]
         ADDRESS_NOTFOUND = 36,
+
+        [Description("Đơn hàng đã xác nhận,không thể hủy!")]
+        CANT_CANCEL_ORDER = 37,
     }
 }
