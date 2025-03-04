@@ -91,7 +91,7 @@ namespace FashionAPI.Controllers
         {
             var response = new BaseResponseMessagePage<PageListOrderDTO>();
             var validToken = validateToken(_context);
-            if (validToken != null)
+            if (validToken is null)
             {
                 return Unauthorized();
             }
@@ -99,7 +99,7 @@ namespace FashionAPI.Controllers
             {
                 var lstOrder = _context.Order.Include(x => x.AddressUu).ThenInclude(x => x.UserUu)
                                              .Include(x => x.OrderItem)
-                                             .Where(x => x.State == request.State)
+                                             .Where(x => x.State == request.State && x.Status == 1)
                                              .Where(x => string.IsNullOrEmpty(request.Keyword) || EF.Functions.Like(x.AddressUu.Fullname, $"%{request.Keyword}"))
                                              .ToList();
                 var totalcount = lstOrder.Count;
@@ -138,6 +138,11 @@ namespace FashionAPI.Controllers
                         };
                         response.Data.Items.Add(convertItemDTO);
                     }
+                    response.Data.Pagination = new Paginations()
+                    {
+                        TotalPage = result.TotalPages,
+                        TotalCount = result.TotalCount,
+                    };
 
                 }
                 return Ok(response);
