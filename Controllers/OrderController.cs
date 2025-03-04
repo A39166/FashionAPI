@@ -85,7 +85,17 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        
+        /*[HttpPost("page-list-order")]
+        [SwaggerResponse(statusCode : 200, type: typeof(BaseResponseMessagePage<>),description: "GetPageListOrder Response"]
+        public async Task<IActionResult> GetPageListOrder(GetPageListOrderRequest)
+        {
+            var response = new BaseResponseMessagePage<>();
+            var validToken = validateToken(_context);
+            
+        }*/
+
+
+
 
     }
     

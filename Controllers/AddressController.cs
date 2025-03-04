@@ -30,10 +30,10 @@ namespace FashionAPI.Controllers
             _logger = logger;
         }
         [HttpPost("upsert-address")]
-        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "UpsertAddress Response")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessage<AddressDTO>), description: "UpsertAddress Response")]
         public async Task<IActionResult> UpsertAddress(UpsertAddressRequest request)
         {
-            var response = new BaseResponse();
+            var response = new BaseResponseMessage<AddressDTO>();
 
             var validToken = validateToken(_context);
             if (validToken is null)
@@ -42,11 +42,12 @@ namespace FashionAPI.Controllers
             }
             try
             {
+                UserAddress address;
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
-                    var hasDefaultAddress = _context.UserAddress.Any(x => x.UserUuid == validToken.UserUuid && x.IsDefault);
-                    var address = new UserAddress()
-                    {
+                    var hasDefaultAddress = _context.UserAddress.Any(x => x.UserUuid == validToken.UserUuid && x.IsDefault && x.Status == 1);
+                    address = new UserAddress()
+                    {   
                         Uuid = Guid.NewGuid().ToString(),
                         UserUuid = validToken.UserUuid,
                         Fullname = request.FullName,
@@ -64,7 +65,7 @@ namespace FashionAPI.Controllers
                 }
                 else
                 {
-                    var address = _context.UserAddress.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
+                    address = _context.UserAddress.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
                     if (address != null)
                     {
                         address.Fullname = request.FullName;
@@ -81,6 +82,39 @@ namespace FashionAPI.Controllers
                         response.error.SetErrorCode(ErrorCode.NOT_FOUND);
                     }
                 }
+                var result = _context.UserAddress
+                                .Include(t => t.MatpNavigation)
+                                .Include(t => t.MaqhNavigation)
+                                .Include(t => t.Xa)
+                                .Where(x => x.Uuid == address.Uuid)
+                .Select(p => new AddressDTO
+                {
+                    Uuid = p.Uuid,
+                    UserUuid = p.UserUuid,
+                    Fullname = p.Fullname,
+                    PhoneNumber = p.PhoneNumber,
+                    Address = p.Address,
+                    TP = p.MatpNavigation != null ? new InfoCatalogDTO
+                    {
+                        Uuid = p.MatpNavigation.Matp,
+                        Name = p.MatpNavigation.Name
+                    } : null,
+                    QH = p.MaqhNavigation != null ? new InfoCatalogDTO
+                    {
+                        Uuid = p.MaqhNavigation.Maqh,
+                        Name = p.MaqhNavigation.Name
+                    } : null,
+                    XA = p.Xa != null ? new InfoCatalogDTO
+                    {
+                        Uuid = p.Xa.Xaid,
+                        Name = p.Xa.Name
+                    } : null,
+                    TimeCreated = p.TimeCreated,
+                    Status = p.Status
+                })
+                .FirstOrDefault();
+
+                response.Data = result;
                 return Ok(response);
             }
             catch (ErrorException ex)
@@ -111,7 +145,7 @@ namespace FashionAPI.Controllers
             try
             {
                 var lstAddress = _context.UserAddress.Include(t => t.MatpNavigation).Include(t => t.MaqhNavigation).Include(t => t.Xa)
-                    .Where(x => x.UserUuid == validToken.UserUuid && x.Status == 1).ToList();
+                    .Where(x => x.UserUuid == validToken.UserUuid && x.Status == 1).OrderByDescending(x => x.IsDefault).ToList();
                 if (lstAddress != null)
                 {
                     response.Data = lstAddress.Select(p => new PageListAddressDTO
