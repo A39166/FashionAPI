@@ -9,6 +9,7 @@ using FashionAPI.Models.DataInfo;
 using FashionAPI.Extensions;
 using FashionAPI.Configuaration;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace FashionAPI.Controllers
 {
@@ -98,7 +99,11 @@ namespace FashionAPI.Controllers
             try
             {
                 var lstOrder = _context.Order.Include(x => x.AddressUu).ThenInclude(x => x.UserUu)
-                                             .Include(x => x.OrderItem)
+                                             .Include(x => x.AddressUu).ThenInclude(t => t.MatpNavigation)
+                                             .Include(x => x.AddressUu).ThenInclude(t => t.MaqhNavigation)
+                                             .Include(x => x.AddressUu).ThenInclude(t => t.Xa)
+                                             .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.ProductUu).ThenInclude(x => x.ProductImage)
+                                             .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.SizeUu)
                                              .Where(x => x.State == request.State && x.Status == 1)
                                              .Where(x => string.IsNullOrEmpty(request.Keyword) || EF.Functions.Like(x.AddressUu.Fullname, $"%{request.Keyword}"))
                                              .ToList();
@@ -128,11 +133,48 @@ namespace FashionAPI.Controllers
                                 UserUuid = order.AddressUu.UserUuid,
                                 Fullname = order.AddressUu.Fullname,
                                 PhoneNumber = order.AddressUu.PhoneNumber,
+                                TP = order.AddressUu.MatpNavigation != null ? new InfoCatalogDTO
+                                {
+                                    Uuid = order.AddressUu.MatpNavigation.Matp,
+                                    Name = order.AddressUu.MatpNavigation.Name
 
+                                } : null,
+                                QH = order.AddressUu.MaqhNavigation != null ? new InfoCatalogDTO
+                                {
+                                    Uuid = order.AddressUu.MaqhNavigation.Maqh,
+                                    Name = order.AddressUu.MaqhNavigation.Name
+
+                                } : null,
+                                XA = order.AddressUu.Xa != null ? new InfoCatalogDTO
+                                {
+                                    Uuid = order.AddressUu.Xa.Xaid,
+                                    Name = order.AddressUu.Xa.Name
+                                } : null,
                             },
+                            Items = order.OrderItem.Where(x => x.Status == 1).Select(item => new OrderItemForPageListOrderAdmin()
+                            {
+                                Uuid = item.Uuid,
+                                Product = item.ProductVariantUu.ProductUu != null ? new ShortProductDTO()
+                                {
+                                    Uuid = item.ProductVariantUu.ProductUu.Uuid,
+                                    ProductName = item.ProductVariantUu.ProductUu.ProductName,
+                                    Code = item.ProductVariantUu.ProductUu.Code,
+                                    ImagesPath = item.ProductVariantUu.ProductUu.ProductImage.Where(x => x.IsDefault == true).Select(p => p.Path).FirstOrDefault(),
+                                } : null,
+                                SizeCategory = item.ProductVariantUu.SizeUu != null ? new ShortCategoryDTO()
+                                {
+                                    Uuid = item.ProductVariantUu.SizeUu.Uuid,
+                                    Name = item.ProductVariantUu.SizeUu.SizeName,
+                                    Status = item.ProductVariantUu.SizeUu.Status,
+                                } : null,
+                                Price = item.Price,
+                                Quantity = item.Quantity,
+                                Status = item.Status,
+                            }).ToList(),
                             TotalCount = order.OrderItem.Where(x => x.OrderUuid == order.Uuid && x.Status == 1).Count(),
                             TotalPrice = order.TotalPrice,
                             State = order.State,
+                            Note = order.Note,
                             TimeCreated = order.TimeCreated,
                             Status = order.Status,
                         };
