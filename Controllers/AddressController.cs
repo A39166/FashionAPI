@@ -110,7 +110,8 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var lstAddress = _context.UserAddress.Where(x => x.UserUuid == validToken.UserUuid && x.Status == 1).ToList();
+                var lstAddress = _context.UserAddress.Include(t => t.MatpNavigation).Include(t => t.MaqhNavigation).Include(t => t.Xa)
+                    .Where(x => x.UserUuid == validToken.UserUuid && x.Status == 1).ToList();
                 if (lstAddress != null)
                 {
                     response.Data = lstAddress.Select(p => new PageListAddressDTO
@@ -142,7 +143,7 @@ namespace FashionAPI.Controllers
                     }).ToList();
                 }
 
-                return Ok(response);
+                    return Ok(response);
             }
             catch (ErrorException ex)
             {
