@@ -63,6 +63,7 @@ namespace FashionAPI.Controllers
                                                                     .Select(v => v.Uuid).FirstOrDefault(),
                         Quantity = item.Quantity,
                         Price = item.Price,
+                        Status = 1
                     };
                     _context.OrderItem.Add(orderitem);
                     var variant = _context.ProductVariant.Where(x => x.ProductUuid == item.ProductUuid && x.SizeUuid == item.SizeUuid)
