@@ -3,11 +3,8 @@ using System.ComponentModel;
 
 namespace FashionAPI.Models.DataInfo
 {
-    public class AddressDTO : BaseDTO
+    public class AddressDTO : ShortUserAddressDTO
     {
-        public string UserUuid { get; set; }
-        public string Fullname { get; set; }
-        public string? PhoneNumber { get; set; }
         public string Address { get; set; }
         public InfoCatalogDTO? TP { get; set; }
 
@@ -17,5 +14,11 @@ namespace FashionAPI.Models.DataInfo
         public DateTime TimeCreated { get; set; }
         public sbyte Status { get; set; }
 
+    }
+    public class ShortUserAddressDTO : BaseDTO
+    {
+        public string UserUuid { get; set; }
+        public string Fullname { get; set; }
+        public string? PhoneNumber { get; set; }
     }
 }

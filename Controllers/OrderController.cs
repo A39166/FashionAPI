@@ -85,14 +85,76 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
-        /*[HttpPost("page-list-order")]
-        [SwaggerResponse(statusCode : 200, type: typeof(BaseResponseMessagePage<>),description: "GetPageListOrder Response"]
-        public async Task<IActionResult> GetPageListOrder(GetPageListOrderRequest)
+        [HttpPost("page-list-order-admin")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessagePage<PageListOrderDTO>), description: "GetPageListOrderAdmin Response")]
+        public async Task<IActionResult> GetPageListOrderAdmin(PageListOrderAdminRequest request)
         {
-            var response = new BaseResponseMessagePage<>();
+            var response = new BaseResponseMessagePage<PageListOrderDTO>();
             var validToken = validateToken(_context);
-            
-        }*/
+            if (validToken != null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var lstOrder = _context.Order.Include(x => x.AddressUu).ThenInclude(x => x.UserUu)
+                                             .Include(x => x.OrderItem)
+                                             .Where(x => x.State == request.State)
+                                             .Where(x => string.IsNullOrEmpty(request.Keyword) || EF.Functions.Like(x.AddressUu.Fullname, $"%{request.Keyword}"))
+                                             .ToList();
+                var totalcount = lstOrder.Count;
+                if (lstOrder != null && lstOrder.Count > 0)
+                {
+                    var result = lstOrder.OrderByDescending(x => x.Id).TakePage(request.Page, request.PageSize);
+                    if (result != null && result.Count > 0)
+                    {
+                        response.Data.Items = new List<PageListOrderDTO>();
+                    }
+                    foreach (var order in result)
+                    {
+                        var convertItemDTO = new PageListOrderDTO()
+                        {
+                            Uuid = order.Uuid,
+                            Code = order.Code,
+                            User = new ShortCategoryDTO()
+                            {
+                                Uuid = order.AddressUu.UserUu.Uuid,
+                                Name = order.AddressUu.UserUu.Fullname,
+                                Status = order.AddressUu.UserUu.Status,
+                            },
+                            UserAddress = new ShortUserAddressDTO()
+                            {
+                                Uuid = order.AddressUu.Uuid,
+                                UserUuid = order.AddressUu.UserUuid,
+                                Fullname = order.AddressUu.Fullname,
+                                PhoneNumber = order.AddressUu.PhoneNumber,
+
+                            },
+                            TotalCount = order.OrderItem.Where(x => x.OrderUuid == order.Uuid && x.Status == 1).Count(),
+                            TotalPrice = order.TotalPrice,
+                            State = order.State,
+                            TimeCreated = order.TimeCreated,
+                            Status = order.Status,
+                        };
+                        response.Data.Items.Add(convertItemDTO);
+                    }
+
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+
+                return BadRequest(response);
+            }
+        }
 
 
 

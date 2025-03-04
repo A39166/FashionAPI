@@ -9,7 +9,9 @@ public class PageListOrderDTO : BaseDTO
 {
     public string Code { get; set; } = null!;
 
-
+    public ShortCategoryDTO User { get; set; }
+    public ShortUserAddressDTO UserAddress { get; set; }
+    public int TotalCount { get; set; }
     public double TotalPrice { get; set; }
 
     /// <summary>
