@@ -319,8 +319,9 @@ namespace FashionAPI.Controllers
 
             try
             {
-                var order = _context.Order.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
-
+                var order = _context.Order.Include(x => x.OrderItem)
+                    .Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                
                 if (order != null)
                 {
                     if(order.State != 0)
@@ -330,6 +331,15 @@ namespace FashionAPI.Controllers
                     else
                     {
                         order.State = 3;
+                        order.TimeUpdate = DateTime.Now;
+                        foreach (var item in order.OrderItem)
+                        {
+                            var variant = item.ProductVariantUu;
+                            if (variant != null)
+                            {
+                                variant.Stock += item.Quantity;
+                            }
+                        };
                     }
                     _context.SaveChanges();
                 }
