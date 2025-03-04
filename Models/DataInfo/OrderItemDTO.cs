@@ -19,6 +19,7 @@ public class OrderItemForPageListOrderAdmin : BaseDTO
 {
     public ShortProductDTO Product { get; set; }
     public ShortCategoryDTO SizeCategory { get; set; }
+    public ShortColorCategoryDTO ColorCategory { get; set; }
     public int Quantity { get; set; }
     public double Price { get; set; }
     public sbyte Status { get; set; }

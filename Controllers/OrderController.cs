@@ -104,6 +104,7 @@ namespace FashionAPI.Controllers
                                              .Include(x => x.AddressUu).ThenInclude(t => t.MaqhNavigation)
                                              .Include(x => x.AddressUu).ThenInclude(t => t.Xa)
                                              .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.ProductUu).ThenInclude(x => x.ProductImage)
+                                             .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.ProductUu).ThenInclude(x => x.ColorUu)
                                              .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.SizeUu)
                                              .Where(x => x.State == request.State && x.Status == 1)
                                              .Where(x => string.IsNullOrEmpty(request.Keyword) || EF.Functions.Like(x.AddressUu.Fullname, $"%{request.Keyword}"))
@@ -168,6 +169,13 @@ namespace FashionAPI.Controllers
                                     Uuid = item.ProductVariantUu.SizeUu.Uuid,
                                     Name = item.ProductVariantUu.SizeUu.SizeName,
                                     Status = item.ProductVariantUu.SizeUu.Status,
+                                } : null,
+                                ColorCategory = item.ProductVariantUu.ProductUu.ColorUu != null ? new ShortColorCategoryDTO
+                                {
+                                    Uuid = item.ProductVariantUu.ProductUu.ColorUu.Uuid,
+                                    Name = item.ProductVariantUu.ProductUu.ColorUu.ColorName,
+                                    Code = item.ProductVariantUu.ProductUu.ColorUu.Code,
+                                    Status = item.ProductVariantUu.ProductUu.ColorUu.Status,
                                 } : null,
                                 Price = item.Price,
                                 Quantity = item.Quantity,
