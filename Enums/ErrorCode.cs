@@ -75,5 +75,8 @@ namespace FashionAPI.Enums
 
         [Description("Không thể khóa size do còn sản phẩm tồn kho!")]
         CANT_LOCKED_SIZE = 35,
+
+        [Description("Không tìm thấy địa chỉ!")]
+        ADDRESS_NOTFOUND = 36,
     }
 }
