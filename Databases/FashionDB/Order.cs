@@ -26,7 +26,7 @@ public partial class Order
 
     public string? Note { get; set; }
 
-    public string? TimeUpdate { get; set; }
+    public DateTime? TimeUpdate { get; set; }
 
     public virtual UserAddress AddressUu { get; set; } = null!;
 
