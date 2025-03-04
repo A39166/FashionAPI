@@ -51,9 +51,11 @@ namespace FashionAPI.Controllers
                     TimeCreated = DateTime.Now,
                     Status = 1
                 };
-                order.Code = "ORD" + order.Id;
                 _context.Order.Add(order);
-                foreach(var item in request.Product)
+                _context.SaveChanges();
+                order.Code = "ORD" + order.Id;
+                _context.Order.Update(order);
+                foreach (var item in request.Product)
                 {
                     var orderitem = new OrderItem()
                     {
