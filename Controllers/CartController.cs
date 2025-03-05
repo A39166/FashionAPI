@@ -54,7 +54,7 @@ namespace FashionAPI.Controllers
                     var item = new CartItem()
                     {
                         Uuid = Guid.NewGuid().ToString(),
-                        CartUuid = existcart.Uuid,
+                        CartUuid = cart.Uuid,
                         ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == requests.ProductUuid && x.SizeUuid == requests.SizeUuid)
                                                                     .Select(v => v.Uuid).FirstOrDefault(),
                         Quantity = requests.quantity,
