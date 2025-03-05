@@ -209,7 +209,115 @@ namespace FashionAPI.Controllers
             }
         }
 
+        [HttpPost("page-list-order-client")]
+        [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessageItem<PageListOrderDTO>), description: "GetPageListOrderClient Response")]
+        public async Task<IActionResult> GetPageListOrderClient(PageListOrderClientRequest request)
+        {
+            var response = new BaseResponseMessageItem<PageListOrderDTO>();
+            var validToken = validateToken(_context);
+            if (validToken is null)
+            {
+                return Unauthorized();
+            }
+            try
+            {
+                var lstOrder = _context.Order.Include(x => x.AddressUu).ThenInclude(x => x.UserUu)
+                                             .Include(x => x.AddressUu).ThenInclude(t => t.MatpNavigation)
+                                             .Include(x => x.AddressUu).ThenInclude(t => t.MaqhNavigation)
+                                             .Include(x => x.AddressUu).ThenInclude(t => t.Xa)
+                                             .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.ProductUu).ThenInclude(x => x.ProductImage)
+                                             .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.ProductUu).ThenInclude(x => x.ColorUu)
+                                             .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.SizeUu)
+                                             .Where(x => x.State == request.State && x.Status == 1)
+                                             .Where(x => x.AddressUu.UserUuid == validToken.UserUuid)
+                                             .ToList();
+                if (lstOrder != null)
+                {
+                    response.Data = lstOrder.Select(order => new PageListOrderDTO
+                    {
+                        Uuid = order.Uuid,
+                        Code = order.Code,
+                        User = new ShortCategoryDTO()
+                        {
+                            Uuid = order.AddressUu.UserUu.Uuid,
+                            Name = order.AddressUu.UserUu.Fullname,
+                            Status = order.AddressUu.UserUu.Status,
+                        },
+                        UserAddress = new ShortUserAddressDTO()
+                        {
+                            Uuid = order.AddressUu.Uuid,
+                            UserUuid = order.AddressUu.UserUuid,
+                            Fullname = order.AddressUu.Fullname,
+                            Address = order.AddressUu.Address,
+                            PhoneNumber = order.AddressUu.PhoneNumber,
+                            TP = order.AddressUu.MatpNavigation != null ? new InfoCatalogDTO
+                            {
+                                Uuid = order.AddressUu.MatpNavigation.Matp,
+                                Name = order.AddressUu.MatpNavigation.Name
 
+                            } : null,
+                            QH = order.AddressUu.MaqhNavigation != null ? new InfoCatalogDTO
+                            {
+                                Uuid = order.AddressUu.MaqhNavigation.Maqh,
+                                Name = order.AddressUu.MaqhNavigation.Name
+
+                            } : null,
+                            XA = order.AddressUu.Xa != null ? new InfoCatalogDTO
+                            {
+                                Uuid = order.AddressUu.Xa.Xaid,
+                                Name = order.AddressUu.Xa.Name
+                            } : null,
+                        },
+                        Items = order.OrderItem.Where(x => x.Status == 1).Select(item => new OrderItemForPageListOrderAdmin()
+                        {
+                            Uuid = item.Uuid,
+                            Product = item.ProductVariantUu.ProductUu != null ? new ShortProductDTO()
+                            {
+                                Uuid = item.ProductVariantUu.ProductUu.Uuid,
+                                ProductName = item.ProductVariantUu.ProductUu.ProductName,
+                                Code = item.ProductVariantUu.ProductUu.Code,
+                                ImagesPath = item.ProductVariantUu.ProductUu.ProductImage.Where(x => x.IsDefault == true).Select(p => p.Path).FirstOrDefault(),
+                            } : null,
+                            SizeCategory = item.ProductVariantUu.SizeUu != null ? new ShortCategoryDTO()
+                            {
+                                Uuid = item.ProductVariantUu.SizeUu.Uuid,
+                                Name = item.ProductVariantUu.SizeUu.SizeName,
+                                Status = item.ProductVariantUu.SizeUu.Status,
+                            } : null,
+                            ColorCategory = item.ProductVariantUu.ProductUu.ColorUu != null ? new ShortColorCategoryDTO
+                            {
+                                Uuid = item.ProductVariantUu.ProductUu.ColorUu.Uuid,
+                                Name = item.ProductVariantUu.ProductUu.ColorUu.ColorName,
+                                Code = item.ProductVariantUu.ProductUu.ColorUu.Code,
+                                Status = item.ProductVariantUu.ProductUu.ColorUu.Status,
+                            } : null,
+                            Price = item.Price,
+                            Quantity = item.Quantity,
+                            Status = item.Status,
+                        }).ToList(),
+                        TotalCount = order.OrderItem.Where(x => x.OrderUuid == order.Uuid && x.Status == 1).Count(),
+                        TotalPrice = order.TotalPrice,
+                        State = order.State,
+                        Note = order.Note,
+                        TimeCreated = order.TimeCreated,
+                        TimeUpdate = order.TimeUpdate,
+                        Status = order.Status,
+                    }).ToList();
+                }
+                return Ok(response);
+            }
+            catch (ErrorException ex)
+            {
+                response.error.SetErrorCode(ex.Code);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                response.error.SetErrorCode(ErrorCode.BAD_REQUEST, ex.Message);
+                _logger.LogError(ex.Message);
+                return BadRequest(response);
+            }
+        }
     }
     
 }
