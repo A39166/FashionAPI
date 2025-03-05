@@ -103,7 +103,7 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var lstColor = _context.Color.ToList();
+                var lstColor = _context.Color.Where(x => x.Status == 1).ToList();
                 var totalcount = lstColor.Count();
 
                 if (lstColor != null && lstColor.Count > 0)

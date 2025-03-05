@@ -122,7 +122,7 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var lstSize = _context.Size.ToList();
+                var lstSize = _context.Size.Where(x => x.Status == 1).ToList();
                 var totalcount = lstSize.Count();
 
                 if (lstSize != null && lstSize.Count > 0)

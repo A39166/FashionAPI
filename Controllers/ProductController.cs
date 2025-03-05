@@ -202,9 +202,8 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var lstProduct = _context.Product.Include(x=> x.ProductVariant).ToList();
+                var lstProduct = _context.Product.Include(x=> x.ProductVariant).Where(x => x.Status == 1).ToList();
                 var totalcount = lstProduct.Count();
-
                 if (lstProduct != null && lstProduct.Count > 0)
                 {
                     var result = lstProduct.OrderByDescending(x => x.Id).TakePage(request.Page, request.PageSize);

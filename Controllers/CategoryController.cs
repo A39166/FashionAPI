@@ -99,7 +99,7 @@ namespace FashionAPI.Controllers
             }
             try
             {
-                var lstCategory = _context.Category.ToList();
+                var lstCategory = _context.Category.Where(x => x.Status == 1).ToList();
                 var totalcount = lstCategory.Count();
 
                 if (lstCategory != null && lstCategory.Count > 0)
