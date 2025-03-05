@@ -51,25 +51,23 @@ namespace FashionAPI.Controllers
                     TimeCreated = DateTime.Now,
                     Status = 1
                 };
+                order.Code = DateTime.Now.ToString("yyMMddHHmmss"); // YYYYMMDDHHmmss
                 _context.Order.Add(order);
-                _context.SaveChanges();
-                order.Code = "ORD" + order.Id;
-                _context.Order.Update(order);
                 foreach (var item in request.Product)
                 {
+                    var variant = _context.ProductVariant.Where(x => x.ProductUuid == item.ProductUuid && x.SizeUuid == item.SizeUuid)
+                                                         .FirstOrDefault();
                     var orderitem = new OrderItem()
                     {
                         Uuid = Guid.NewGuid().ToString(),
                         OrderUuid = order.Uuid,
-                        ProductVariantUuid = _context.ProductVariant.Where(x => x.ProductUuid == item.ProductUuid && x.SizeUuid == item.SizeUuid)
-                                                                    .Select(v => v.Uuid).FirstOrDefault(),
+                        ProductVariantUuid = variant.Uuid,
                         Quantity = item.Quantity,
                         Price = item.Price,
                         Status = 1
                     };
                     _context.OrderItem.Add(orderitem);
-                    var variant = _context.ProductVariant.Where(x => x.ProductUuid == item.ProductUuid && x.SizeUuid == item.SizeUuid)
-                                                         .FirstOrDefault();
+                    /*var cartItem = _context.CartItem.Where(x => x.ProductVariantUuid == variant.Uuid && )*/
                     variant.Stock = variant.Stock - item.Quantity;
                     _context.ProductVariant.Update(variant);
                 }
