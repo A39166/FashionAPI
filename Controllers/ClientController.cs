@@ -230,6 +230,7 @@ namespace FashionAPI.Controllers
                                              .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.SizeUu)
                                              .Where(x => x.State == request.State && x.Status == 1)
                                              .Where(x => x.AddressUu.UserUuid == validToken.UserUuid)
+                                             .OrderByDescending(x => x.TimeCreated)
                                              .ToList();
                 if (lstOrder != null)
                 {

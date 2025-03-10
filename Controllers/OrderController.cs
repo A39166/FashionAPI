@@ -109,6 +109,7 @@ namespace FashionAPI.Controllers
                                              .Include(x => x.OrderItem).ThenInclude(x => x.ProductVariantUu).ThenInclude(x => x.SizeUu)
                                              .Where(x => x.State == request.State && x.Status == 1)
                                              .Where(x => string.IsNullOrEmpty(request.Keyword) || EF.Functions.Like(x.AddressUu.Fullname, $"%{request.Keyword}"))
+                                             .OrderByDescending(x => x.TimeCreated)
                                              .ToList();
                 var totalcount = lstOrder.Count;
                 if (lstOrder != null && lstOrder.Count > 0)

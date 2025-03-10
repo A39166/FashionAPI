@@ -229,23 +229,23 @@ namespace FashionAPI.Controllers
 
                 if (size != null)
                 {
-                    if (size.Status == 1)
-                    {
-                        var variant = _context.ProductVariant.Where(x => x.SizeUuid == size.Uuid && x.Stock != 0).FirstOrDefault();
-                        if (variant != null)
-                        {
-                            size.Status = 0;
-                        }
-                        else
-                        {
-                            throw new ErrorException(ErrorCode.CANT_LOCKED_SIZE);
-                        }
+                    var variant = _context.ProductVariant.Where(x => x.SizeUuid == size.Uuid && x.Stock != 0 && size.Status == 1).FirstOrDefault();
                         
+                    if (variant == null)
+                    {
+                        var lstvariant = _context.ProductVariant.Where(x => x.SizeUuid == size.Uuid && size.Status == 1).ToList();
+                        size.Status = 0;
+                        foreach(var i in lstvariant)
+                        {
+                            i.Status = 0;
+                        }
                     }
                     else
                     {
-                        size.Status = 1;
+                        throw new ErrorException(ErrorCode.CANT_DELETE_SIZE);
                     }
+                        
+
                     _context.SaveChanges();
                 }
                 else
