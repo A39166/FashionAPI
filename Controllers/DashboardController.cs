@@ -112,42 +112,68 @@ namespace FashionAPI.Controllers
 
                 if (request.Filter == 1) // Lọc theo tuần (trả về ngày-tháng)
                 {
-                    orderData = query
-                        .GroupBy(o => o.TimeCreated.ToString("dd/MM"))
-                        .Select(g => new DashboardChartDTO
-                        {
-                            CountSuccess = g.Count(o => o.State == 2),
-                            CountCancel = g.Count(o => o.State == 3),
-                            Date = g.Key // MM-DD
-                        })
-                        .OrderBy(g => g.Date)
-                        .ToList();
+                    var allDays = Enumerable.Range(0, 7)
+                            .Select(i => startDate.AddDays(i).ToString("dd/MM"))
+                            .ToList();
+                    var groupedData = query
+                    .GroupBy(o => o.TimeCreated.ToString("dd/MM"))
+                    .ToDictionary(g => g.Key, g => new DashboardChartDTO
+                    {
+                        CountSuccess = g.Count(o => o.State == 2),
+                        CountCancel = g.Count(o => o.State == 3),
+                        Date = g.Key
+                    });
+
+                    orderData = allDays.Select(date => groupedData.ContainsKey(date) ? groupedData[date] : new DashboardChartDTO
+                    {
+                        CountSuccess = 0,
+                        CountCancel = 0,
+                        Date = date
+                    }).OrderBy(g => g.Date).ToList();
                 }
                 else if (request.Filter == 2) // Lọc theo tháng (trả về tháng-năm)
                 {
-                    orderData = query
+                    var allDays = Enumerable.Range(1, endDate.Day)
+                            .Select(i => new DateTime(today.Year, today.Month, i).ToString("dd/MM"))
+                            .ToList();
+
+                    var groupedData = query
                         .GroupBy(o => o.TimeCreated.ToString("dd/MM"))
-                        .Select(g => new DashboardChartDTO
+                        .ToDictionary(g => g.Key, g => new DashboardChartDTO
                         {
                             CountSuccess = g.Count(o => o.State == 2),
                             CountCancel = g.Count(o => o.State == 3),
-                            Date = g.Key 
-                        })
-                        .OrderBy(g => g.Date)
-                        .ToList();
+                            Date = g.Key
+                        });
+
+                    orderData = allDays.Select(date => groupedData.ContainsKey(date) ? groupedData[date] : new DashboardChartDTO
+                    {
+                        CountSuccess = 0,
+                        CountCancel = 0,
+                        Date = date
+                    }).OrderBy(g => g.Date).ToList();
                 }
                 else if (request.Filter == 3) 
                 {
-                    orderData = query
-                        .GroupBy(o => o.TimeCreated.ToString("MM/yyyy")) 
-                        .Select(g => new DashboardChartDTO
+                    var allMonths = Enumerable.Range(1, 12)
+                              .Select(i => new DateTime(today.Year, i, 1).ToString("MM/yyyy"))
+                              .ToList();
+
+                    var groupedData = query
+                        .GroupBy(o => o.TimeCreated.ToString("MM/yyyy"))
+                        .ToDictionary(g => g.Key, g => new DashboardChartDTO
                         {
                             CountSuccess = g.Count(o => o.State == 2),
                             CountCancel = g.Count(o => o.State == 3),
-                            Date = g.Key 
-                        })
-                        .OrderBy(g => g.Date)
-                        .ToList();
+                            Date = g.Key
+                        });
+
+                    orderData = allMonths.Select(month => groupedData.ContainsKey(month) ? groupedData[month] : new DashboardChartDTO
+                    {
+                        CountSuccess = 0,
+                        CountCancel = 0,
+                        Date = month
+                    }).OrderBy(g => g.Date).ToList();
                 }
                 response.Data = orderData;
                 return Ok(response);
