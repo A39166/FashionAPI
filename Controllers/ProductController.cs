@@ -231,12 +231,11 @@ namespace FashionAPI.Controllers
                                 Name = p.Name,
                                 Status = p.Status
                             }).FirstOrDefault(),
-                            Selled = _context.Order
-    .Include(x => x.OrderItem)
-    .Where(x => x.State == 2) 
-    .SelectMany(x => x.OrderItem) 
-    .Where(x => x.ProductVariantUu.ProductUuid == product.Uuid)
-    .Sum(x => x.Quantity), 
+                            Selled = _context.Order.Include(x => x.OrderItem)
+                                                   .Where(x => x.State == 2) 
+                                                   .SelectMany(x => x.OrderItem) 
+                                                   .Where(x => x.ProductVariantUu.ProductUuid == product.Uuid)
+                                                   .Sum(x => x.Quantity), 
                             Price = product.Price,
                             ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == product.Uuid && x.IsDefault == true).Select(x => x.Path).FirstOrDefault(),
                             Status = product.Status,
