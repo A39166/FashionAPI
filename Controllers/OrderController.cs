@@ -51,7 +51,7 @@ namespace FashionAPI.Controllers
                     TimeCreated = DateTime.Now,
                     Status = 1
                 };
-                order.Code = DateTime.Now.ToString("yyMMddHHmmss"); // YYYYMMDDHHmmss
+                order.Code = DateTime.Now.ToString("yyMMddHHmmss");
                 _context.Order.Add(order);
                 foreach (var item in request.Product)
                 {
@@ -183,7 +183,7 @@ namespace FashionAPI.Controllers
                                 Quantity = item.Quantity,
                                 Status = item.Status,
                             }).ToList(),
-                            TotalCount = order.OrderItem.Where(x => x.OrderUuid == order.Uuid && x.Status == 1).Count(),
+                            TotalCount = order.OrderItem.Where(x => x.OrderUuid == order.Uuid && x.Status == 1).Sum(x => x.Quantity),
                             TotalPrice = order.TotalPrice,
                             State = order.State,
                             Note = order.Note,

@@ -231,7 +231,7 @@ namespace FashionAPI.Controllers
                                 Name = p.Name,
                                 Status = p.Status
                             }).FirstOrDefault(),
-                            Selled = 0,
+                            Selled = _context.OrderItem.Where(x => x.ProductVariantUu.ProductUuid == product.Uuid).Sum(x => x.Quantity),
                             Price = product.Price,
                             ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == product.Uuid && x.IsDefault == true).Select(x => x.Path).FirstOrDefault(),
                             Status = product.Status,

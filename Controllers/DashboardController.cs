@@ -88,9 +88,9 @@ namespace FashionAPI.Controllers
 
                 switch (request.Filter)
                 {
-                    case 1: 
+                    case 1:
                         startDate = today.AddDays(-6);
-                        endDate = today;
+                        endDate = today.AddDays(1).AddTicks(-1); 
                         break;
                     case 2: 
                         startDate = new DateTime(today.Year, today.Month, 1);
