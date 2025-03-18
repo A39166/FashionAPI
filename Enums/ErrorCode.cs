@@ -81,5 +81,8 @@ namespace FashionAPI.Enums
 
         [Description("Đơn hàng đã xác nhận,không thể hủy!")]
         CANT_CANCEL_ORDER = 37,
+
+        [Description("Sản phẩm đã có!")]
+        DUPLICATE_PRODUCT = 38,
     }
 }

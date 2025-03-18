@@ -42,8 +42,14 @@ namespace FashionAPI.Controllers
             }
             try
             {
+                
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
+                    var check = _context.Product.Where(x => x.Code == request.Code).FirstOrDefault();
+                    if (check != null)
+                    {
+                        throw new ErrorException(ErrorCode.DUPLICATE_PRODUCT);
+                    }
                     var product = new Product()
                     {
                         Uuid = Guid.NewGuid().ToString(),
