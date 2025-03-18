@@ -50,7 +50,7 @@ namespace FashionAPI.Controllers
                     SuccessOrder = _context.Order.Where(x => x.State == 2 && x.Status == 1).Count(),
                     CancelOrder = _context.Order.Where(x => x.State == 3 && x.Status == 1).Count(),
                     TotalRevenue = _context.Order.Where(x => x.State == 2 && x.Status == 1).Sum(x => x.TotalPrice),
-                    TotalRevenueByDay = _context.Order.Where(x => x.TimeCreated == DateTime.Now && x.State == 2 && x.Status == 1).Sum(b => b.TotalPrice),
+                    TotalRevenueByDay = _context.Order.Where(x => x.TimeCreated.Date == DateTime.Now.Date && x.State == 2 && x.Status == 1).Sum(b => b.TotalPrice),
                     TotalRevenueByMonth = _context.Order.Where(b => b.TimeCreated >= startOfMonth && b.TimeCreated <= endOfMonth && b.State == 2 && b.Status == 1).Sum(b => b.TotalPrice),
                     TotalRevenueByYear = _context.Order.Where(b => b.TimeCreated.Year == DateTime.Now.Year && b.State == 2 && b.Status == 1).Sum(b => b.TotalPrice)
                 };
