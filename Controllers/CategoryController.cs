@@ -44,7 +44,7 @@ namespace FashionAPI.Controllers
             {
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
-                    
+                    var check = _context.Category.Where(x => x.Name.ToLower().Trim() == request.CategoryName.ToLower().Trim() && x.Status == 1).FirstOrDefault();
                     var category = new Category()
                     {
                         Uuid = Guid.NewGuid().ToString(),

@@ -49,7 +49,7 @@ namespace FashionAPI.Controllers
             {
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
-                    var check = _context.Size.Where(x => x.SizeName.ToLower() == request.SizeName.ToLower()).FirstOrDefault();
+                    var check = _context.Size.Where(x => x.SizeName.ToLower() == request.SizeName.ToLower() && x.Status == 1).FirstOrDefault();
                     if(check != null)
                     {
                         throw new ErrorException(ErrorCode.DUPLICATE_SIZE);

@@ -41,10 +41,10 @@ namespace FashionAPI.Controllers
             {
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
-                    var check = _context.Color.Where(x => x.ColorName.ToLower() == request.ColorName.ToLower()).FirstOrDefault();
+                    var check = _context.Color.Where(x => x.ColorName.ToLower() == request.ColorName.ToLower() && x.Status == 1).FirstOrDefault();
                     if (check != null)
                     {
-                        throw new ErrorException(ErrorCode.DUPLICATE_SIZE);
+                        throw new ErrorException(ErrorCode.DUPLICATE_COLOR);
                     }
                     var color = new Color()
                     {
