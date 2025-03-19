@@ -45,6 +45,10 @@ namespace FashionAPI.Controllers
                 if (string.IsNullOrEmpty(request.Uuid))
                 {
                     var check = _context.Category.Where(x => x.Name.ToLower().Trim() == request.CategoryName.ToLower().Trim() && x.Status == 1).FirstOrDefault();
+                    if (check != null)
+                    {
+                        throw new ErrorException(ErrorCode.DUPLICATE_CATEGORY);
+                    }
                     var category = new Category()
                     {
                         Uuid = Guid.NewGuid().ToString(),
