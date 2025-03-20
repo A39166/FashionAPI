@@ -87,5 +87,8 @@ namespace FashionAPI.Enums
 
         [Description("Danh mục đã có!")]
         DUPLICATE_CATEGORY = 39,
+
+        [Description("Sản phẩm không còn tồn tại!")]
+        PRODUCT_NOTFOUND = 40,
     }
 }

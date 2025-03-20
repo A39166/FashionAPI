@@ -151,7 +151,7 @@ namespace FashionAPI.Controllers
             try
             {
                 var productdetail = _context.Product.Include(p => p.ProductVariant)
-                                                    .Where(x => x.Uuid == request.Uuid).SingleOrDefault();
+                                                    .Where(x => x.Uuid == request.Uuid && x.Status == 1).SingleOrDefault();
                 if (productdetail != null)
                 {
                     var productImages = _context.ProductImage.Where(img => img.ProductUuid == productdetail.Uuid && img.Status == 1)
@@ -193,6 +193,10 @@ namespace FashionAPI.Controllers
 
                     };
 
+                }
+                else
+                {
+                    throw new ErrorException(ErrorCode.PRODUCT_NOTFOUND);
                 }
                 return Ok(response);
             }
