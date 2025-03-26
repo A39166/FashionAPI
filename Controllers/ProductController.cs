@@ -306,7 +306,7 @@ namespace FashionAPI.Controllers
                         Price = productdetail.Price,
                         TimeCreated = productdetail.TimeCreated,
                         Status = productdetail.Status,
-                        Variants = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
+                        Variants = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid && v.Status == 1)
                         .Select(v => new Variant
                         {
                             Uuid = v.Uuid,

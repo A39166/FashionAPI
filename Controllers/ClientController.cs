@@ -38,15 +38,23 @@ namespace FashionAPI.Controllers
                 var featured = _context.Product.Include(x => x.ProductVariant)
                                        .Where(x => x.Status == 1).Take(8)
                                                  .ToList();
-                response.Data = featured.Select(p => new FeaturedListProductDTO
-                {
-                    Uuid = p.Uuid,
-                    ProductName = p.ProductName,
-                    Code = p.Code,
-                    Price = p.Price,
-                    ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == p.Uuid && x.IsDefault == true).Select(x => x.Path).FirstOrDefault(),
-                    isSoldOut = p.ProductVariant.All(v => v.Stock == 0 && v.Status == 1),
-                    Status = p.Status,
+                var responseData = featured.Select(p => {
+                    var activeVariants = p.ProductVariant.Where(v => v.Status == 1).ToList(); // Chỉ lấy các biến thể hợp lệ
+                    bool isSoldOut = activeVariants.Any() && activeVariants.All(v => v.Stock == 0); // Kiểm tra hết hàng
+
+                    return new FeaturedListProductDTO
+                    {
+                        Uuid = p.Uuid,
+                        ProductName = p.ProductName,
+                        Code = p.Code,
+                        Price = p.Price,
+                        ImagesPath = _context.ProductImage
+                                             .Where(x => x.ProductUuid == p.Uuid && x.IsDefault == true)
+                                             .Select(x => x.Path)
+                                             .FirstOrDefault(),
+                        isSoldOut = isSoldOut,
+                        Status = p.Status,
+                    };
                 }).ToList();
 
                 return Ok(response);
@@ -102,8 +110,11 @@ namespace FashionAPI.Controllers
                    
                     foreach (var product in result)
                     {
+                        var activeVariants = product.ProductVariant.Where(v => v.Status == 1).ToList(); // Chỉ lấy các biến thể hợp lệ
+                        bool isSoldOut = activeVariants.Any() && activeVariants.All(v => v.Stock == 0); // Kiểm tra hết hàng
                         var convertItemDTO = new PageListProductClientDTO()
                         {
+
                             Uuid = product.Uuid,
                             ProductName = product.ProductName,
                             Code = product.Code,
@@ -116,7 +127,7 @@ namespace FashionAPI.Controllers
                             }).FirstOrDefault(),
                             Price = product.Price,
                             ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == product.Uuid && x.IsDefault == true && x.Status == 1).Select(x => x.Path).FirstOrDefault(),
-                            isSoldOut = product.ProductVariant.All(v => v.Stock == 0 && v.Status == 1),
+                            isSoldOut = isSoldOut,
                             Status = product.Status,
                         };
                         response.Data.Items.Add(convertItemDTO);

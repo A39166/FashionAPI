@@ -63,6 +63,15 @@ namespace FashionAPI.Controllers
                 else
                 //cập nhập dữ liệu
                 {
+                    var check = _context.Category
+                            .Where(x => x.Name.ToLower().Trim() == request.CategoryName.ToLower().Trim() &&
+                                        x.Status == 1 &&
+                                        x.Uuid != request.Uuid) // Loại bỏ chính nó khỏi kiểm tra
+                            .FirstOrDefault();
+                    if (check != null)
+                    {
+                        throw new ErrorException(ErrorCode.DUPLICATE_CATEGORY);
+                    }
                     var category = _context.Category.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
                     if (category != null)
                     {

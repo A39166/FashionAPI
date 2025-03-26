@@ -61,6 +61,15 @@ namespace FashionAPI.Controllers
                 else
                 //cập nhập dữ liệu
                 {
+                    var check = _context.Color
+                            .Where(x => x.ColorName.ToLower() == request.ColorName.ToLower() &&
+                                        x.Status == 1 &&
+                                        x.Uuid != request.Uuid) // Loại bỏ chính nó khỏi kiểm tra
+                            .FirstOrDefault();
+                    if (check != null)
+                    {
+                        throw new ErrorException(ErrorCode.DUPLICATE_COLOR);
+                    }
                     var color = _context.Color.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
                     if (color != null)
                     {

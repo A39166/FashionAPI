@@ -83,6 +83,15 @@ namespace FashionAPI.Controllers
                     var size = _context.Size.Where(x => x.Uuid == request.Uuid).FirstOrDefault();
                     if (size != null)
                     {
+                        var check = _context.Size
+                            .Where(x => x.SizeName.ToLower() == request.SizeName.ToLower() &&
+                                        x.Status == 1 &&
+                                        x.Uuid != request.Uuid)
+                            .FirstOrDefault();
+                        if (check != null)
+                        {
+                            throw new ErrorException(ErrorCode.DUPLICATE_SIZE);
+                        }
                         size.SizeName = request.SizeName;
                         size.Description = request.Description;
                         size.Status = 1;
