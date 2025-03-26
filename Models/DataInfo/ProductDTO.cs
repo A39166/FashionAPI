@@ -24,5 +24,6 @@ namespace FashionAPI.Models.DataInfo
         public string Code { set; get; }
         public double Price { get; set; }
         public string? ImagesPath { get; set; }
+        public sbyte Status {  set; get; }
     }
 }

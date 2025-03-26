@@ -9,5 +9,6 @@ namespace FashionAPI.Models.DataInfo
         public double Price { get; set; }
         public string ImagesPath { get; set; }
         public sbyte Status { get; set; }
+        public bool isSoldOut {  get; set; }
     }
 }

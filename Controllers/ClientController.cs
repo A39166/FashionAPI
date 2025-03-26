@@ -35,7 +35,8 @@ namespace FashionAPI.Controllers
             var response = new BaseResponseMessageItem<FeaturedListProductDTO>();
             try
             {
-                var featured = _context.Product.Where(x => x.Status == 1).Take(8)
+                var featured = _context.Product.Include(x => x.ProductVariant)
+                                       .Where(x => x.Status == 1).Take(8)
                                                  .ToList();
                 response.Data = featured.Select(p => new FeaturedListProductDTO
                 {
@@ -44,6 +45,7 @@ namespace FashionAPI.Controllers
                     Code = p.Code,
                     Price = p.Price,
                     ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == p.Uuid && x.IsDefault == true).Select(x => x.Path).FirstOrDefault(),
+                    isSoldOut = p.ProductVariant.All(v => v.Stock == 0 && v.Status == 1),
                     Status = p.Status,
                 }).ToList();
 
@@ -114,6 +116,7 @@ namespace FashionAPI.Controllers
                             }).FirstOrDefault(),
                             Price = product.Price,
                             ImagesPath = _context.ProductImage.Where(x => x.ProductUuid == product.Uuid && x.IsDefault == true && x.Status == 1).Select(x => x.Path).FirstOrDefault(),
+                            isSoldOut = product.ProductVariant.All(v => v.Stock == 0 && v.Status == 1),
                             Status = product.Status,
                         };
                         response.Data.Items.Add(convertItemDTO);
@@ -152,52 +155,50 @@ namespace FashionAPI.Controllers
             {
                 var productdetail = _context.Product.Include(p => p.ProductVariant)
                                                     .Where(x => x.Uuid == request.Uuid && x.Status == 1).SingleOrDefault();
-                if (productdetail != null)
-                {
-                    var productImages = _context.ProductImage.Where(img => img.ProductUuid == productdetail.Uuid && img.Status == 1)
-                                                             .OrderByDescending(img => img.IsDefault)
-                                                             .Select(img => img.Path)
-                                                             .ToList();
-                    response.Data = new ProductDetailClientDTO()
-                    {
-                        Uuid = productdetail.Uuid,
-                        Color = _context.Color.Where(p => p.Uuid == productdetail.ColorUuid && p.Status == 1).Select(p => new ShortColorDTO
-                        {
-                            Uuid = p.Uuid,
-                            ColorName = p.ColorName,
-                            Code = p.Code,
-                            Status = p.Status
-                        }).FirstOrDefault(),
-                        Category = _context.Category.Where(p => p.Uuid == productdetail.CatUuid && p.Status == 1).Select(p => new ShortCategoryDTO
-                        {
-                            Uuid = p.Uuid,
-                            Name = p.Name,
-                            Status = p.Status
-                        }).FirstOrDefault(),
-                        Code = productdetail.Code,
-                        ProductName = productdetail.ProductName,
-                        ShortDescription = productdetail.ShortDescription,
-                        Description = productdetail.Description,
-                        Price = productdetail.Price,
-                        Status = productdetail.Status,
-                        Size = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
-                        .Select(v => new ShortSizeCategoryDTO
-                        {
-                            Uuid = v.SizeUu.Uuid,
-                            Name = v.SizeUu.SizeName,
-                            Stock = v.Stock,
-                            Status = v.SizeUu.Status,
-                        })
-                        .ToList(),
-                        ImagesPath = productImages
 
-                    };
-
-                }
-                else
+                if (productdetail == null)
                 {
                     throw new ErrorException(ErrorCode.PRODUCT_NOTFOUND);
                 }
+                var productImages = _context.ProductImage.Where(img => img.ProductUuid == productdetail.Uuid && img.Status == 1)
+                                                             .OrderByDescending(img => img.IsDefault)
+                                                             .Select(img => img.Path)
+                                                             .ToList();
+                var detail = new ProductDetailClientDTO()
+                {
+                    Uuid = productdetail.Uuid,
+                    Color = _context.Color.Where(p => p.Uuid == productdetail.ColorUuid && p.Status == 1).Select(p => new ShortColorDTO
+                    {
+                        Uuid = p.Uuid,
+                        ColorName = p.ColorName,
+                        Code = p.Code,
+                        Status = p.Status
+                    }).FirstOrDefault(),
+                    Category = _context.Category.Where(p => p.Uuid == productdetail.CatUuid && p.Status == 1).Select(p => new ShortCategoryDTO
+                    {
+                        Uuid = p.Uuid,
+                        Name = p.Name,
+                        Status = p.Status
+                    }).FirstOrDefault(),
+                    Code = productdetail.Code,
+                    ProductName = productdetail.ProductName,
+                    ShortDescription = productdetail.ShortDescription,
+                    Description = productdetail.Description,
+                    Price = productdetail.Price,
+                    Status = productdetail.Status,
+                    Size = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
+                    .Select(v => new ShortSizeCategoryDTO
+                    {
+                        Uuid = v.SizeUu.Uuid,
+                        Name = v.SizeUu.SizeName,
+                        Stock = v.Stock,
+                        Status = v.SizeUu.Status,
+                    })
+                    .ToList(),
+                    ImagesPath = productImages
+
+                };
+                response.Data = detail;
                 return Ok(response);
             }
             catch (ErrorException ex)
@@ -282,6 +283,7 @@ namespace FashionAPI.Controllers
                                 ProductName = item.ProductVariantUu.ProductUu.ProductName,
                                 Code = item.ProductVariantUu.ProductUu.Code,
                                 ImagesPath = item.ProductVariantUu.ProductUu.ProductImage.Where(x => x.IsDefault == true).Select(p => p.Path).FirstOrDefault(),
+                                Status = item.ProductVariantUu.ProductUu.Status,
                             } : null,
                             SizeCategory = item.ProductVariantUu.SizeUu != null ? new ShortCategoryDTO()
                             {

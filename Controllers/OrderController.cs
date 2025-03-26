@@ -165,6 +165,7 @@ namespace FashionAPI.Controllers
                                     ProductName = item.ProductVariantUu.ProductUu.ProductName,
                                     Code = item.ProductVariantUu.ProductUu.Code,
                                     ImagesPath = item.ProductVariantUu.ProductUu.ProductImage.Where(x => x.IsDefault == true).Select(p => p.Path).FirstOrDefault(),
+                                    Status = item.ProductVariantUu.ProductUu.Status,
                                 } : null,
                                 SizeCategory = item.ProductVariantUu.SizeUu != null ? new ShortCategoryDTO()
                                 {
@@ -286,6 +287,7 @@ namespace FashionAPI.Controllers
                                 ProductName = item.ProductVariantUu.ProductUu.ProductName,
                                 Code = item.ProductVariantUu.ProductUu.Code,
                                 ImagesPath = item.ProductVariantUu.ProductUu.ProductImage.Where(x => x.IsDefault == true).Select(p => p.Path).FirstOrDefault(),
+                                Status = item.ProductVariantUu.ProductUu.Status,
                             } : null,
                             SizeCategory = item.ProductVariantUu.SizeUu != null ? new ShortCategoryDTO()
                             {
