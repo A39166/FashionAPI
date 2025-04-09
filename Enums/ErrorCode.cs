@@ -90,5 +90,14 @@ namespace FashionAPI.Enums
 
         [Description("Sản phẩm không còn tồn tại!")]
         PRODUCT_NOTFOUND = 40,
+
+/*        [Description("Không tìm thấy size sản phẩm!")]
+        VARIANT_NOTFOUND = 41,
+
+        [Description("Size sản phẩm đã hết hàng")]
+        OUT_OF_QUANTITY = 40,
+
+        [Description("Sản phẩm không còn tồn tại!")]
+        PRODUCT_NOTFOUND = 40,*/
     }
 }

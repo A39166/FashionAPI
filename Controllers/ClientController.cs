@@ -35,12 +35,20 @@ namespace FashionAPI.Controllers
             var response = new BaseResponseMessageItem<FeaturedListProductDTO>();
             try
             {
-                var featured = _context.Product.Include(x => x.ProductVariant)
-                                       .Where(x => x.Status == 1).Take(8)
-                                                 .ToList();
-                var responseData = featured.Select(p => {
-                    var activeVariants = p.ProductVariant.Where(v => v.Status == 1).ToList(); // Chỉ lấy các biến thể hợp lệ
-                    bool isSoldOut = activeVariants.Any() && activeVariants.All(v => v.Stock == 0); // Kiểm tra hết hàng
+                var featured = _context.Product
+                                       .Include(x => x.ProductVariant)
+                                       .Where(x => x.Status == 1)
+                                       .ToList();
+
+                // Nếu có hơn 4 sản phẩm thì random 4 cái
+                var selectedProducts = featured.Count > 4
+                    ? featured.OrderBy(x => Guid.NewGuid()).Take(4).ToList()
+                    : featured;
+
+                var responseData = selectedProducts.Select(p =>
+                {
+                    var activeVariants = p.ProductVariant.Where(v => v.Status == 1).ToList();
+                    bool isSoldOut = activeVariants.Any() && activeVariants.All(v => v.Stock == 0);
 
                     return new FeaturedListProductDTO
                     {
@@ -57,6 +65,8 @@ namespace FashionAPI.Controllers
                     };
                 }).ToList();
 
+                response.Data = responseData;
+
                 return Ok(response);
             }
             catch (ErrorException ex)
@@ -72,6 +82,7 @@ namespace FashionAPI.Controllers
                 return BadRequest(response);
             }
         }
+
         [HttpPost("page-list-product-client")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponseMessagePage<PageListProductClientDTO>), description: "GetPageListProductClient Response")]
         public async Task<IActionResult> GetPageListProductClient(PageListProductClientRequest request)
@@ -166,7 +177,7 @@ namespace FashionAPI.Controllers
             {
                 var productdetail = _context.Product.Include(p => p.ProductVariant)
                                                     .Where(x => x.Uuid == request.Uuid && x.Status == 1).SingleOrDefault();
-
+                bool isSoldOut = !_context.ProductVariant.Where(v => v.ProductUuid == request.Uuid && v.Status == 1).Any(v => v.Stock > 0);
                 if (productdetail == null)
                 {
                     throw new ErrorException(ErrorCode.PRODUCT_NOTFOUND);
@@ -197,7 +208,7 @@ namespace FashionAPI.Controllers
                     Description = productdetail.Description,
                     Price = productdetail.Price,
                     Status = productdetail.Status,
-                    Size = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid)
+                    Size = _context.ProductVariant.Where(v => v.ProductUuid == productdetail.Uuid && v.Status == 1)
                     .Select(v => new ShortSizeCategoryDTO
                     {
                         Uuid = v.SizeUu.Uuid,

@@ -41,6 +41,32 @@ namespace FashionAPI.Controllers
             }
             try
             {
+                foreach (var item in request.Product)
+                {
+                    var variant = _context.ProductVariant
+                        .Include(x => x.ProductUu)
+                        .FirstOrDefault(x => x.ProductUuid == item.ProductUuid && x.SizeUuid == item.SizeUuid && x.Status == 1);
+
+                    if (variant == null)
+                    {
+                        response.error.SetErrorCode(ErrorCode.PRODUCT_NOTFOUND, "Không tìm thấy biến thể sản phẩm.");
+                        return Ok(response);
+                    }
+
+                    if (variant.Stock <= 0)
+                    {
+                        response.error.SetErrorCode(ErrorCode.BAD_REQUEST, $"Size sản phẩm {variant.ProductUu.ProductName} đã hết hàng.");
+                        return Ok(response);
+                    }
+
+                    if (variant.Stock < item.Quantity)
+                    {
+                        response.error.SetErrorCode(ErrorCode.BAD_REQUEST, $"Sản phẩm {variant.ProductUu.ProductName} không đủ số lượng tồn kho.");
+                        return Ok(response);
+                    }
+                }
+
+
                 var order = new Order()
                 {
                     Uuid = Guid.NewGuid().ToString(),
