@@ -202,6 +202,7 @@ namespace FashionAPI.Controllers
                         Name = p.Name,
                         Status = p.Status
                     }).FirstOrDefault(),
+                    IsSoldOut = isSoldOut,
                     Code = productdetail.Code,
                     ProductName = productdetail.ProductName,
                     ShortDescription = productdetail.ShortDescription,
@@ -218,6 +219,7 @@ namespace FashionAPI.Controllers
                     })
                     .ToList(),
                     ImagesPath = productImages
+                    
 
                 };
                 response.Data = detail;

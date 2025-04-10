@@ -14,5 +14,6 @@ namespace FashionAPI.Models.DataInfo
         public List<ShortSizeCategoryDTO> Size { get; set; }
         public List<string>? ImagesPath { get; set; }
         public sbyte Status { get; set; }
+        public bool IsSoldOut {  get; set; }
     }
 }
