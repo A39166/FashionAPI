@@ -202,7 +202,7 @@ namespace FashionAPI.Controllers
 
         [HttpPost("remove-item-from-cart")]
         [SwaggerResponse(statusCode: 200, type: typeof(BaseResponse), description: "RemoveItemFromCart Response")]
-        public async Task<IActionResult> RemoveItemFromCart(UuidRequest request)
+        public async Task<IActionResult> RemoveItemFromCart(RemoveFromCartRequest request)
         {
             var response = new BaseResponse();
 
@@ -214,19 +214,17 @@ namespace FashionAPI.Controllers
 
             try
             {
-                var item = _context.CartItem.Where(x => x.Uuid == request.Uuid).SingleOrDefault();
 
-                if (item != null)
+                var items = _context.CartItem.Where(x => request.Uuid.Contains(x.Uuid)).ToList();
+
+                if (!items.Any())
                 {
-
-                    _context.CartItem.Remove(item);
-                    _context.SaveChanges();
-
+                    throw new ErrorException(ErrorCode.PRODUCT_NOTFOUND);
                 }
-                else
-                {
-                    response.error.SetErrorCode(ErrorCode.NOT_FOUND);
-                }
+
+                _context.CartItem.RemoveRange(items);
+                _context.SaveChanges();
+
                 return Ok(response);
             }
             catch (ErrorException ex)
@@ -243,6 +241,8 @@ namespace FashionAPI.Controllers
             }
         }
 
+
+
     }
-    
+
 }
